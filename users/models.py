@@ -1,3 +1,48 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+import uuid
+from warehouse.models import Warehouse
 
-# Create your models here.
+ROLES = [
+    ("admin", "admin"),
+    ("manager", "manager"),
+    ("branch_director", "branch_director"),
+    ("supervisor", "supervisor"),
+    ("operator", "operator"),
+    ("agent", "agent"),
+    ("driver", "driver")
+]
+
+class CustomUser(AbstractUser):
+    id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, primary_key=True)
+    email = None
+    phone_number = models.CharField(max_length=15)
+    phone_number2 = models.CharField(
+        max_length=15,
+        blank=True,
+        null=True
+    )
+    address = models.CharField(max_length=100)
+    birth_date = models.DateField(
+        null=True,
+        blank=True
+    )
+    created_at = models.DateField(auto_now_add=True)
+    status = models.CharField(max_length=30, default="active")
+    role = models.CharField(
+        max_length=30,
+        choices=ROLES
+    )
+    warehouse = models.ForeignKey(
+        Warehouse,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} ({self.role})"
+
+
+
+
