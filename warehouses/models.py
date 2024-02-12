@@ -15,3 +15,11 @@ class Warehouse(models.Model):
     def __str__(self):
         return f"{self.name}, {self.address}"
 
+class WarehouseProduct(models.Model):
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    amount = models.IntegerField()
+    comment = models.TextField(null=True, blank=True)
+    date_time = models.DateTimeField(auto_now_add=True)
+
+
