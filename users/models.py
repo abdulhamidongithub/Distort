@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import uuid
-from warehouse.models import Warehouse
+from warehouses.models import Warehouse
 
 ROLES = [
     ("admin", "admin"),
@@ -43,6 +43,18 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.role})"
 
+class UserSalary(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    fixed = models.PositiveIntegerField()
+    kpi_by_sales = models.PositiveIntegerField()
+    comment = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(null=True, blank=True, auto_now=True)
 
-
+class UserSalaryPayment(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="user_salary_payments")
+    payer = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="payer_payments")
+    salary = models.PositiveIntegerField()
+    paid_at = models.DateTimeField()
+    comment = models.TextField(null=True, blank=True)
 

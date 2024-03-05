@@ -1,6 +1,5 @@
 from django.db import models
 import uuid
-from users.models import CustomUser
 from products.models import Product
 
 class Warehouse(models.Model):
