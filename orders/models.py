@@ -15,3 +15,5 @@ class Order(models.Model):
     date_time = models.DateTimeField()
     comment = models.TextField(blank=True, null=True)
 
+    class Meta:
+        ordering = ["-id"]
