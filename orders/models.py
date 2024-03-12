@@ -4,6 +4,13 @@ from customers.models import CustomerStore
 from users.models import CustomUser
 from warehouses.models import Warehouse
 
+STATUSES = [
+    ("Accepted", "Accepted"),
+    ("Processing", "Processing"),
+    ("Delivered", "Delivered"),
+    ("Cancelled", "Cancelled"),
+]
+
 class Order(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     customer = models.ForeignKey(CustomerStore, on_delete=models.SET_NULL, null=True)
@@ -14,6 +21,11 @@ class Order(models.Model):
     deadline = models.DateTimeField()
     date_time = models.DateTimeField()
     comment = models.TextField(blank=True, null=True)
+    status = models.CharField(
+        max_length=30,
+        choices=STATUSES,
+        default="Accepted"
+    )
 
     class Meta:
         ordering = ["-id"]
