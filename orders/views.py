@@ -9,6 +9,12 @@ from .serializers import *
 class OrdersAPIView(APIView):
     def get(self, request):
         orders = Order.objects.all()
+        date = request.query_params.get("date")
+        status = request.query_params.get("status")
+        if date:
+            orders = orders.filter(date_time__startswith=date)
+        if status:
+            orders = orders.filter(status=status)
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
@@ -33,3 +39,5 @@ class OrderAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             saved_order = serializer.save()
         return Response({"Order updated": saved_order})
+
+

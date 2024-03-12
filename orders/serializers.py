@@ -17,6 +17,7 @@ class OrderSerializer(serializers.ModelSerializer):
         instance.deadline = validated_data.get('deadline', instance.deadline)
         instance.date_time = validated_data.get('date_time', instance.date_time)
         instance.comment = validated_data.get('comment', instance.comment)
+        instance.status = validated_data.get('status', instance.status)
 
         instance.save()
         return instance

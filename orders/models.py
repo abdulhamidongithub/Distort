@@ -5,8 +5,7 @@ from users.models import CustomUser
 from warehouses.models import Warehouse
 
 STATUSES = [
-    ("Accepted", "Accepted"),
-    ("Processing", "Processing"),
+    ("Active", "Active"),
     ("Delivered", "Delivered"),
     ("Cancelled", "Cancelled"),
 ]
@@ -24,7 +23,7 @@ class Order(models.Model):
     status = models.CharField(
         max_length=30,
         choices=STATUSES,
-        default="Accepted"
+        default="Active"
     )
 
     class Meta:
