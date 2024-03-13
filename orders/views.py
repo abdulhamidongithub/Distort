@@ -2,6 +2,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from drf_yasg.utils import swagger_auto_schema
 
 from .models import *
 from .serializers import *
@@ -29,6 +30,7 @@ class OrdersAPIView(APIView):
             status.HTTP_200_OK
         )
 
+    @swagger_auto_schema(request_body=OrderSerializer)
     def post(self, request):
         order = request.data
         serializer = OrderSerializer(data=order)
@@ -42,7 +44,7 @@ class OrderAPIView(APIView):
         serializer = OrderSerializer(order)
         return Response(serializer.data)
 
-
+    @swagger_auto_schema(request_body=OrderSerializer)
     def put(self, request, pk):
         saved_order = get_object_or_404(Order.objects.all(), pk=pk)
         data = request.data
