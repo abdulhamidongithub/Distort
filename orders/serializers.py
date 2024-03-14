@@ -1,9 +1,10 @@
 from rest_framework import serializers
 
 from .models import *
-
+from customers.serializers import CustomerStoreSerializer
 
 class OrderSerializer(serializers.ModelSerializer):
+    customer = CustomerStoreSerializer()
     class Meta:
         model = Order
         fields = '__all__'

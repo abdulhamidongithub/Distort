@@ -7,6 +7,7 @@ from warehouses.models import Warehouse
 STATUSES = [
     ("Active", "Active"),
     ("Delivered", "Delivered"),
+    ("Confirmed", "Confirmed"),
     ("Cancelled", "Cancelled"),
 ]
 
