@@ -43,7 +43,7 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.role})"
 
-class UserSalary(models.Model):
+class SalaryParams(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
     fixed = models.PositiveIntegerField()
     kpi_by_sales = models.PositiveIntegerField()
@@ -51,10 +51,10 @@ class UserSalary(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True, auto_now=True)
 
-class UserSalaryPayment(models.Model):
+class SalaryPayment(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="user_salary_payments")
     payer = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="payer_payments")
-    salary = models.PositiveIntegerField()
+    amount = models.PositiveIntegerField()
     paid_at = models.DateTimeField()
     comment = models.TextField(null=True, blank=True)
 
