@@ -58,3 +58,8 @@ class SalaryPayment(models.Model):
     paid_at = models.DateTimeField()
     comment = models.TextField(null=True, blank=True)
 
+class Car(models.Model):
+    type = models.CharField(max_length=50)
+    number = models.CharField(max_length=10)
+    driver = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+
