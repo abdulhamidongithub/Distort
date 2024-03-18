@@ -29,3 +29,8 @@ class Order(models.Model):
 
     class Meta:
         ordering = ["-id"]
+
+class KPIEarning(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    amount = models.IntegerField()
+

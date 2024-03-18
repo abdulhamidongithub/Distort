@@ -39,6 +39,7 @@ class CustomUser(AbstractUser):
         null=True,
         blank=True
     )
+    balance = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.role})"
@@ -50,6 +51,7 @@ class SalaryParams(models.Model):
     comment = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True, auto_now=True)
+
 
 class SalaryPayment(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="user_salary_payments")
