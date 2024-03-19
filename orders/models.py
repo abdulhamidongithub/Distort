@@ -32,5 +32,6 @@ class Order(models.Model):
 
 class KPIEarning(models.Model):
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
     amount = models.IntegerField()
 
