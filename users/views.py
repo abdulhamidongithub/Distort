@@ -27,4 +27,9 @@ class UserAPIView(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
-
+class UserSalaryPaymentsAPIView(APIView):
+    def get(self, request):
+        user = request.user
+        salary_payments = SalaryPayment.objects.filter(user=user)
+        serializer = SalaryPaymentSerializer(salary_payments, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
