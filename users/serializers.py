@@ -9,3 +9,8 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'phone_number', "role", "username", "address",
             "birth_date", "status", "warehouse"
             ]
+
+class SalaryPaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SalaryPayment
+        fields = '__all__'
