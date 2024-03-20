@@ -53,4 +53,26 @@ class OrderAPIView(APIView):
             saved_order = serializer.save()
         return Response({"Order updated": saved_order})
 
-
+class DriverOrdersAPIView(APIView):
+    def get(self, request):
+        driver = request.user
+        orders = Order.objects.filter(driver=driver)
+        date = request.query_params.get("date")
+        status = request.query_params.get("status")
+        if date:
+            orders = orders.filter(date_time__startswith=date)
+        if status:
+            orders = orders.filter(status=status)
+        counts = {
+            "active": orders.filter(status="Active").count(),
+            "delivered": orders.filter(status="Delivered").count(),
+            "cancelled": orders.filter(status="Cancelled").count()
+        }
+        serializer = OrderSerializer(orders, many=True)
+        return Response(
+            {
+                "counts": counts,
+                "orders": serializer.data,
+            },
+            status.HTTP_200_OK
+        )
