@@ -33,3 +33,11 @@ class UserSalaryPaymentsAPIView(APIView):
         salary_payments = SalaryPayment.objects.filter(user=user)
         serializer = SalaryPaymentSerializer(salary_payments, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
+
+# class CarDetailAPIView(APIView):
+#     def get(self, request):
+#         car = Car.objects.filter()
+#         serializer = CarSerializer(car, many=True)
+#         return Response(serializer.data, status.HTTP_200_OK)
+
+
