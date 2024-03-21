@@ -27,6 +27,7 @@ class CustomUser(AbstractUser):
         null=True,
         blank=True
     )
+    photo = models.FileField(null=True, blank=True, upload_to="profile_photos")
     created_at = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=30, default="active")
     role = models.CharField(
