@@ -29,4 +29,11 @@ class CarSerializer(serializers.ModelSerializer):
         model = Car
         fields = '__all__'
 
+    def update(self, instance, validated_data):
+        instance.type = validated_data.get('type', instance.type)
+        instance.number = validated_data.get('number', instance.number)
+        instance.driver = validated_data.get('driver', instance.driver)
+
+        instance.save()
+        return instance
 
