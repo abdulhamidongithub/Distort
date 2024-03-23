@@ -34,10 +34,13 @@ class UserSalaryPaymentsAPIView(APIView):
         serializer = SalaryPaymentSerializer(salary_payments, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
-# class CarDetailAPIView(APIView):
-#     def get(self, request):
-#         car = Car.objects.filter()
-#         serializer = CarSerializer(car, many=True)
-#         return Response(serializer.data, status.HTTP_200_OK)
+class CarUpdateAPIView(APIView):
+    @swagger_auto_schema(request_body=CarSerializer)
+    def put(self, request, pk):
+        car = get_object_or_404(Car.objects.all(), id=pk)
+        serializer = CarSerializer(instance=car, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            car = serializer.save()
+        return Response({"Car updated": car})
 
 

@@ -11,5 +11,6 @@ urlpatterns = [
 
     path('salary_payments/', UserSalaryPaymentsAPIView.as_view()),
     path('details/<str:pk>/', UserAPIView.as_view()),
+    path('car/<str:pk>/', CarUpdateAPIView.as_view()),
 ]
 
