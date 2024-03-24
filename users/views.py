@@ -43,4 +43,12 @@ class CarUpdateAPIView(APIView):
             car = serializer.save()
         return Response({"Car updated": car})
 
+class ChangePasswordAPIView(APIView):
+    def put(self, request):
+        serializer = ChangePasswordSerializer(instance=self.request.user, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
