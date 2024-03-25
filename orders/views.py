@@ -6,6 +6,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from .models import *
 from .serializers import *
+from warehouse.models import WarehouseProduct
 
 class OrdersAPIView(APIView):
     def get(self, request):
@@ -33,6 +34,9 @@ class OrdersAPIView(APIView):
     @swagger_auto_schema(request_body=OrderSerializer)
     def post(self, request):
         order = request.data
+        product = WarehouseProduct.objects.get(id=order.get("product"))
+        if product.amount < order.amount:
+            return Response({"success": "false", "message": f"Miqdor yetarli emas. Mavjud miqdor: {product.amount}"})
         serializer = OrderSerializer(data=order)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
