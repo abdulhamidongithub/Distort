@@ -13,6 +13,16 @@ class OrdersAPIView(APIView):
         orders = Order.objects.all()
         date = request.query_params.get("date")
         status = request.query_params.get("status")
+        customer = request.query_params.get("customer")
+        product = request.query_params.get("product")
+        if customer:
+            orders = orders.filter( customer__id = customer
+                ) | orders.filter( customer__name__icontains = customer
+                ) | orders.filter( customer__address__icontains = customer
+                ) | orders.filter(customer__phone__icontains = customer)
+        if product:
+            orders = orders.filter( product__id = product
+                ) | orders.filter( product__name__icontains = product)
         if date:
             orders = orders.filter(date_time__startswith=date)
         if status:
