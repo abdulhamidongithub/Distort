@@ -18,6 +18,7 @@ class WarehouseProduct(models.Model):
     warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     amount = models.IntegerField()
+    invalids_amount = models.IntegerField(default=0)
     comment = models.TextField(null=True, blank=True)
     date_time = models.DateTimeField(auto_now_add=True)
 

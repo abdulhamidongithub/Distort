@@ -6,7 +6,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from .models import *
 from .serializers import *
-from warehouse.models import WarehouseProduct
+from warehouses.models import WarehouseProduct
 
 class OrdersAPIView(APIView):
     def get(self, request):
