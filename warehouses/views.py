@@ -1,6 +1,8 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.generics import get_object_or_404
+from drf_yasg.utils import swagger_auto_schema
 
 from .models import *
 from customers.models import CustomerStore
@@ -14,9 +16,17 @@ class WarehouseProductsAPIView(APIView):
         serializer = WarehouseProductSerializer(ware_products, many=True)
         return Response(serializer.data)
 
-class WarehouseClientsAPIView(APIView):
+class WarehouseCustomersAPIView(APIView):
     def get(self, request, pk):
-        ware_users = CustomUser.objects.filter(warehouse__id=pk)
-        ware_clients = CustomerStore.objects.filter(agent__in=ware_users)
-        serializer = CustomerStoreSerializer(ware_clients, many=True)
+        warehouse_clients = CustomerStore.objects.filter(warehouse__id=pk)
+        serializer = CustomerStoreSerializer(warehouse_clients, many=True)
         return Response(serializer.data)
+
+    @swagger_auto_schema(request_body=CustomerStoreSerializer)
+    def post(self, request, pk):
+        warehouse = get_object_or_404(Warehouse.objects.all(), id=pk)
+        serializer = CustomerStoreSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(warehouse=warehouse)
+        return Response(serializer.data, status.HTTP_200_OK)
+
