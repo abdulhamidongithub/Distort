@@ -66,3 +66,12 @@ class Car(models.Model):
     number = models.CharField(max_length=10)
     driver = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
 
+class Task(models.Model):
+    text = models.TextField()
+    task_setter = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null = True)
+    task_executor = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null = True, related_name='bajaruvchi_tasklari')
+    created_at = models.DateField(auto_now_add=True)
+    deadline = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=30)
+    def __str__(self):
+        return self.text
