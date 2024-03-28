@@ -8,6 +8,7 @@ from .models import *
 from customers.models import CustomerStore
 from customers.serializers import CustomerStoreSerializer
 from users.models import CustomUser
+from users.serializers import UserSerializer
 from .serializers import *
 
 class WarehouseProductsAPIView(APIView):
@@ -29,4 +30,12 @@ class WarehouseCustomersAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save(warehouse=warehouse)
         return Response(serializer.data, status.HTTP_200_OK)
+
+class WarehouseAgentsAPIView(APIView):
+    def get(self, request, pk):
+        agents = CustomUser.objects.filter(
+            warehouse__id = pk, role = 'Agent'
+        )
+        serializer = UserSerializer(agents, many=True)
+        return Response(serializer.data)
 
