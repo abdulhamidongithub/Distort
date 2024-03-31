@@ -5,6 +5,8 @@ from drf_yasg import openapi
 from django.conf import settings
 from django.conf.urls.static import static
 
+from products.views import *
+
 schema_view = get_schema_view(
    openapi.Info(
       title="Distrox API",
@@ -23,5 +25,8 @@ urlpatterns = [
     path('orders/', include('orders.urls')),
     path('customers/', include('customers.urls')),
     path('products/', include('products.urls')),
+
+    path('categories/', CategoriesAPIView.as_view()),
+    path('category/<int:pk>/products/', CategoryProductsAPIView.as_view()),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
