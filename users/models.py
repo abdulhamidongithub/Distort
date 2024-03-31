@@ -69,7 +69,7 @@ class Car(models.Model):
 class Task(models.Model):
     text = models.TextField()
     task_setter = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null = True)
-    task_executor = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null = True, related_name='bajaruvchi_tasklari')
+    task_executors = models.ManyToMany('users.CustomUser', related_name='bajaruvchilar_tasklari')
     created_at = models.DateField(auto_now_add=True)
     deadline = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=30)

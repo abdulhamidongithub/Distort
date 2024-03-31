@@ -37,6 +37,11 @@ class CarSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = '__all__'
+
 class ChangePasswordSerializer(serializers.ModelSerializer):
     old_password = serializers.CharField(required=True, write_only=True)
     new_password = serializers.CharField(required=True, write_only=True)

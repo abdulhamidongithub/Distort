@@ -7,8 +7,8 @@ from drf_yasg.utils import swagger_auto_schema
 from .models import *
 from customers.models import CustomerStore
 from customers.serializers import CustomerStoreSerializer
-from users.models import CustomUser
-from users.serializers import UserSerializer
+from users.models import CustomUser, Task
+from users.serializers import UserSerializer, TaskSerializer
 from .serializers import *
 
 class WarehouseProductsAPIView(APIView):
@@ -38,4 +38,12 @@ class WarehouseAgentsAPIView(APIView):
         )
         serializer = UserSerializer(agents, many=True)
         return Response(serializer.data)
+
+class WarehouseTasksAPIView(APIView):
+    def get(self, request, pk):
+        warehouse_users = CustomUser.objects.filter(warehouse__id = pk)
+        tasks = Task.objects.filter(task_executors__in = warehouse_users)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+
 

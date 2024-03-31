@@ -51,4 +51,10 @@ class ChangePasswordAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class TaskCreateAPIView(APIView):
+    def post(self, request):
+        serializer = TaskSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status.HTTP_201_CREATED)
 
