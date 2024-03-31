@@ -23,6 +23,14 @@ class WarehouseProductDetailAPIView(APIView):
         serializer = WarehouseProductSerializer(ware_product)
         return Response(serializer.data)
 
+    @swagger_auto_schema(request_body=WarehouseProductSerializer)
+    def put(self, request, ware_pk, pr_pk):
+        ware_product = get_object_or_404(WarehouseProduct.objects.all(), id=pr_pk, warehouse__id=ware_pk)
+        serializer = WarehouseProductSerializer(ware_product, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status.HTTP_202_ACCEPTED)
+
 class WarehouseCustomersAPIView(APIView):
     def get(self, request, pk):
         warehouse_clients = CustomerStore.objects.filter(warehouse__id=pk)

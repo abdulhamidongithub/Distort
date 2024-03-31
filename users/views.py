@@ -44,6 +44,7 @@ class CarUpdateAPIView(APIView):
         return Response({"Car updated": car})
 
 class ChangePasswordAPIView(APIView):
+    @swagger_auto_schema(request_body=ChangePasswordSerializer)
     def put(self, request):
         serializer = ChangePasswordSerializer(instance=self.request.user, data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -52,6 +53,7 @@ class ChangePasswordAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TaskCreateAPIView(APIView):
+    @swagger_auto_schema(request_body=TaskSerializer)
     def post(self, request):
         serializer = TaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

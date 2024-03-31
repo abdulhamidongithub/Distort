@@ -17,3 +17,5 @@ class CustomersAPIView(APIView):
                         ) | customers.filter(phone__icontains = search)
         serializer = CustomerStoreSerializer(customers, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
+
+
