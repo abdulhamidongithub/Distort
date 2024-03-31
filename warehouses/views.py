@@ -17,6 +17,12 @@ class WarehouseProductsAPIView(APIView):
         serializer = WarehouseProductSerializer(ware_products, many=True)
         return Response(serializer.data)
 
+class WarehouseProductDetailAPIView(APIView):
+    def get(self, request, ware_pk, pr_pk):
+        ware_product = get_object_or_404(WarehouseProduct.objects.all(), id=pr_pk, warehouse__id=ware_pk)
+        serializer = WarehouseProductSerializer(ware_product)
+        return Response(serializer.data)
+
 class WarehouseCustomersAPIView(APIView):
     def get(self, request, pk):
         warehouse_clients = CustomerStore.objects.filter(warehouse__id=pk)

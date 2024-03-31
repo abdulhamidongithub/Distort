@@ -15,6 +15,7 @@ class Warehouse(models.Model):
         return f"{self.name}, {self.address}"
 
 class WarehouseProduct(models.Model):
+    id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, primary_key=True)
     warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     amount = models.IntegerField()
