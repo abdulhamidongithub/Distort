@@ -24,3 +24,17 @@ class CustomersAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status.HTTP_201_CREATED)
+
+class CustomerDetailView(APIView):
+    def get(self, request, pk):
+        customer = get_object_or_404(CustomerStore.objects.all(), id=pk)
+        serializer = CustomerStoreSerializer(customer)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(request_body=CustomerStoreSerializer)
+    def put(self, request, pk):
+        customer = get_object_or_404(CustomerStore.objects.all(), id=pk)
+        serializer = CustomerStoreSerializer(customer, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
