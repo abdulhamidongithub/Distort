@@ -18,6 +18,7 @@ class CustomersAPIView(APIView):
         serializer = CustomerStoreSerializer(customers, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=CustomerStoreSerializer)
     def post(self, request):
         serializer = CustomerStoreSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
