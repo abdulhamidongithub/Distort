@@ -13,6 +13,13 @@ class ProductsAPIView(APIView):
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(request_body=ProductSerializer)
+    def post(self, request):
+        serializer = ProductSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
 class CategoriesAPIView(APIView):
     def get(self, request):
         categories = (Category.objects.all())
