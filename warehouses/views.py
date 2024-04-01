@@ -45,12 +45,15 @@ class WarehouseCustomersAPIView(APIView):
             serializer.save(warehouse=warehouse)
         return Response(serializer.data, status.HTTP_200_OK)
 
-class WarehouseAgentsAPIView(APIView):
+class WarehouseEmployeesAPIView(APIView):
     def get(self, request, pk):
-        agents = CustomUser.objects.filter(
-            warehouse__id = pk, role = 'Agent'
+        employees = CustomUser.objects.filter(
+            warehouse__id = pk
         )
-        serializer = UserSerializer(agents, many=True)
+        role = request.query_params.get("role")
+        if role:
+            employees = employees.filter(role = role.lower())
+        serializer = UserSerializer(employees, many=True)
         return Response(serializer.data)
 
 class WarehouseTasksAPIView(APIView):
