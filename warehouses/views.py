@@ -41,8 +41,8 @@ class WarehouseCustomersAPIView(APIView):
     def post(self, request, pk):
         warehouse = get_object_or_404(Warehouse.objects.all(), id=pk)
         serializer = CustomerStoreSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(warehouse=warehouse)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(warehouse=warehouse)
         return Response(serializer.data, status.HTTP_200_OK)
 
 class WarehouseEmployeesAPIView(APIView):
@@ -63,4 +63,15 @@ class WarehouseTasksAPIView(APIView):
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
+class WarehousesAPIView(APIView):
+    def get(self, request):
+        warehouses = Warehouse.objects.all()
+        serializer = WarehouseSerializer(warehouses, many=True)
+        return Response(serializer.data)
 
+    @swagger_auto_schema(request_body=WarehouseSerializer)
+    def post(self, request):
+        serializer = WarehouseSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status.HTTP_201_CREATED)
