@@ -7,7 +7,7 @@ class CustomerStore(models.Model):
     name = models.CharField(max_length=50)
     phone = models.CharField(max_length=15)
     address = models.CharField(max_length=100)
-    location = models.JSONField()
+    location = models.JSONField(null=True, blank=True)
     status = models.CharField(max_length=30, default="active")
     created_at = models.DateField(auto_now_add=True)
     warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True)
