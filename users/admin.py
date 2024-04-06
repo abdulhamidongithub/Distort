@@ -32,10 +32,10 @@ class SalaryPaymentAdmin(admin.ModelAdmin):
     list_per_page = 30
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ["task", "task_setter", "task_executors", 'status', "deadline"]
+    list_display = ["text", "task_setter", 'status', "deadline"]
     list_editable = ["status", "deadline"]
     list_filter = ["task_setter", "task_executors", "status"]
-    search_fields = ["task_setter", "task_executors", "deadline"]
+    search_fields = ["text", "task_setter", "task_executors", "deadline"]
     list_per_page = 30
 
 admin.site.register(CustomUser, CustomUserAdmin)
