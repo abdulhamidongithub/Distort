@@ -20,7 +20,10 @@ class WarehouseProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     amount = models.IntegerField()
     invalids_amount = models.IntegerField(default=0)
+
+class WarehouseProductArrival(models.Model):
+    warehouse_product = models.ForeignKey(WarehouseProduct, on_delete=models.CASCADE)
+    amount = models.IntegerField()
     comment = models.TextField(null=True, blank=True)
     date_time = models.DateTimeField(auto_now_add=True)
-
 
