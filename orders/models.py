@@ -19,7 +19,7 @@ class Order(models.Model):
     driver = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="driver_orders")
     amount = models.IntegerField()
     deadline = models.DateTimeField()
-    date_time = models.DateTimeField()
+    date_time = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, null=True)
     status = models.CharField(
         max_length=30,
@@ -33,5 +33,5 @@ class Order(models.Model):
 class KPIEarning(models.Model):
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
-    amount = models.IntegerField()
+    amount = models.FloatField()
 
