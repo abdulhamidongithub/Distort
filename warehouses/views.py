@@ -18,6 +18,7 @@ class WarehouseProductsAPIView(APIView):
         return Response(serializer.data)
 
 class WarehouseProductCreteOrUpdate(APIView):
+    @swagger_auto_schema(request_body=WarehouseProductSerializer)
     def post(self, request):
         serializer = WarehouseProductSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

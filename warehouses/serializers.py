@@ -16,19 +16,3 @@ class WarehouseProductSerializer(serializers.Serializer):
     comment = serializers.CharField()
 
 
-    def create(self, validated_data):
-        warehouse_product, created = WarehouseProduct.objects.get_or_create(
-            warehouse=validated_data['warehouse'],
-            product=validated_data['product'],
-            defaults={'amount': validated_data['amount']}
-        )
-        if not created:
-            warehouse_product.amount += validated_data['amount']
-            warehouse_product.save()
-        WarehouseProductArrival.objects.create(
-            warehouse_product = warehouse_product,
-            amount = validated_data['amount'],
-            comment = validated_data['comment']
-        )
-        return warehouse_product
-
