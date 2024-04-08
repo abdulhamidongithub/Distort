@@ -9,4 +9,5 @@ urlpatterns = [
     path('<str:pk>/employees/', WarehouseEmployeesAPIView.as_view()),
     path('<str:pk>/tasks/', WarehouseTasksAPIView.as_view()),
     path('all/', WarehousesAPIView.as_view()),
+    path('warehouse_product/create/', WarehouseProductCreteOrUpdate.as_view()),
 ]

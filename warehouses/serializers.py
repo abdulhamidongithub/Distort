@@ -7,11 +7,14 @@ class WarehouseSerializer(serializers.ModelSerializer):
         model = Warehouse
         fields = '__all__'
 
-class WarehouseProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = WarehouseProduct
-        fields = '__all__'
-        read_only_fields = ["invalids_amount", "date_time"]
+class WarehouseProductSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    product = serializers.IntegerField()
+    warehouse = serializers.IntegerField()
+    amount = serializers.IntegerField()
+    invalids_amount = serializers.IntegerField()
+    comment = serializers.CharField()
+
 
     def create(self, validated_data):
         warehouse_product, created = WarehouseProduct.objects.get_or_create(
@@ -22,5 +25,10 @@ class WarehouseProductSerializer(serializers.ModelSerializer):
         if not created:
             warehouse_product.amount += validated_data['amount']
             warehouse_product.save()
+        WarehouseProductArrival.objects.create(
+            warehouse_product = warehouse_product,
+            amount = validated_data['amount'],
+            comment = validated_data['comment']
+        )
         return warehouse_product
 

@@ -17,19 +17,32 @@ class WarehouseProductsAPIView(APIView):
         serializer = WarehouseProductSerializer(ware_products, many=True)
         return Response(serializer.data)
 
+class WarehouseProductCreteOrUpdate(APIView):
+    def post(self, request):
+        serializer = WarehouseProductSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+        warehouse_product, created = WarehouseProduct.objects.get_or_create(
+            warehouse=validated_data['warehouse'],
+            product=validated_data['product'],
+            defaults={'amount': validated_data['amount']}
+        )
+        if not created:
+            warehouse_product.amount += validated_data['amount']
+            warehouse_product.save()
+        WarehouseProductArrival.objects.create(
+            warehouse_product=warehouse_product,
+            amount=validated_data['amount'],
+            comment=validated_data['comment']
+        )
+        serializer = WarehouseProductSerializer(warehouse_product)
+        return Response({"warehouse_product": serializer.data})
+
 class WarehouseProductDetailAPIView(APIView):
     def get(self, request, ware_pk, pr_pk):
         ware_product = get_object_or_404(WarehouseProduct.objects.all(), id=pr_pk, warehouse__id=ware_pk)
         serializer = WarehouseProductSerializer(ware_product)
         return Response(serializer.data)
-
-    @swagger_auto_schema(request_body=WarehouseProductSerializer)
-    def put(self, request, ware_pk, pr_pk):
-        ware_product = get_object_or_404(WarehouseProduct.objects.all(), id=pr_pk, warehouse__id=ware_pk)
-        serializer = WarehouseProductSerializer(ware_product, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status.HTTP_202_ACCEPTED)
 
 class WarehouseCustomersAPIView(APIView):
     def get(self, request, pk):
