@@ -15,7 +15,6 @@ ROLES = [
 
 class CustomUser(AbstractUser):
     id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, primary_key=True)
-    email = None
     phone_number = models.CharField(max_length=15)
     phone_number2 = models.CharField(
         max_length=15,
