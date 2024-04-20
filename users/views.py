@@ -3,9 +3,20 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView
+)
 
 from .models import *
 from .serializers import *
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+class MyTokenRefreshView(TokenRefreshView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 class UsersAPIView(APIView):
     def get(self, request):

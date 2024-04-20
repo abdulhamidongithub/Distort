@@ -1,6 +1,33 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import *
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, attrs):
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        user = CustomUser.objects.filter(username=username, password=password).first()
+
+        if user:
+            refresh = RefreshToken.for_user(user)
+
+            return {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }
+
+        # If user is not authenticated, still generate tokens
+
+        return {
+            'success': "false",
+            'message': "User not found",
+        }
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
