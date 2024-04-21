@@ -7,6 +7,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView
 )
+from rest_framework_simplejwt.tokens import AccessToken
 
 from .models import *
 from .serializers import *
@@ -21,9 +22,9 @@ class MyTokenRefreshView(TokenRefreshView):
 class UsersAPIView(APIView):
     def get(self, request):
         users = CustomUser.objects.all()
-        status = request.query_params.get("status")
-        if status:
-            users = users.filter(status = status.lower())
+        role = request.query_params.get("role")
+        if role:
+            users = users.filter(role = role.lower())
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
@@ -40,6 +41,18 @@ class UserAPIView(APIView):
         user = get_object_or_404(CustomUser.objects.all(), id=pk)
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+class UserAPIView2(APIView):
+    # User details based on the token
+    def get(self, request, access_token):
+        try:
+            token = AccessToken(access_token)
+            user_id = token.payload['user_id']
+            user = CustomUser.objects.get(id=user_id)
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({"success": "false", "message": "User not found"}, status.HTTP_400_BAD_REQUEST)
 
 class UserSalaryPaymentsAPIView(APIView):
     def get(self, request):
