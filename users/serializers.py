@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import status
 
 from .models import *
 
@@ -22,12 +23,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 'access': str(refresh.access_token),
             }
 
-        # If user is not authenticated, still generate tokens
-
-        return {
+        raise serializers.ValidationError({
             'success': "false",
-            'message': "User not found",
-        }
+            'message': 'User not found'
+        }, code=status.HTTP_400_BAD_REQUEST)
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

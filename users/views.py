@@ -21,6 +21,9 @@ class MyTokenRefreshView(TokenRefreshView):
 class UsersAPIView(APIView):
     def get(self, request):
         users = CustomUser.objects.all()
+        status = request.query_params.get("status")
+        if status:
+            users = users.filter(status = status.lower())
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
