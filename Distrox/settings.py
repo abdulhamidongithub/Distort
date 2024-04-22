@@ -19,7 +19,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -100,8 +100,8 @@ else:
             'NAME': env("DB_NAME"),
             'USER': env("DB_USER"),
             'PASSWORD': env("PASSWORD"),
-            'HOST': '',
-            'PORT': '',
+            'HOST': 'localhost',
+            'PORT': '3306',
         }
     }
 # ASGI_APPLICATION = "Distrox.asgi.application"
@@ -110,11 +110,6 @@ else:
 #     "default": {
 #         "BACKEND": 'channels.layers.InMemoryChannelLayer'
 #     }
-# }
-
-# SIMPLE_JWT = {
-#     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=180),
-#     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=365),
 # }
 
 
