@@ -33,7 +33,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = [
             'id', 'phone_number', "role", "username", "address",
-            "birth_date", "status", "warehouse"
+            "birth_date", "status", "warehouse", "is_available"
             ]
 
     def to_representation(self, instance):
@@ -43,6 +43,19 @@ class UserSerializer(serializers.ModelSerializer):
             serializer = CarSerializer(car.first())
             data.update({"car": serializer.data})
         return data
+
+    def update(self, instance, validated_data):
+        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
+        instance.role = validated_data.get('role', instance.role)
+        instance.username = validated_data.get('username', instance.username)
+        instance.warehouse = validated_data.get('warehouse', instance.warehouse)
+        instance.address = validated_data.get('address', instance.address)
+        instance.birth_date = validated_data.get('birth_date', instance.birth_date)
+        instance.status = validated_data.get('status', instance.status)
+        instance.is_available = validated_data.get('is_available', instance.is_available)
+
+        instance.save()
+        return instance
 
 
 class SalaryPaymentSerializer(serializers.ModelSerializer):

@@ -40,6 +40,7 @@ class CustomUser(AbstractUser):
         blank=True
     )
     balance = models.IntegerField(default=0)
+    is_available = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.role})"
