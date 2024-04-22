@@ -1,5 +1,5 @@
 from pathlib import Path
-import datetime
+from datetime import timedelta
 import os
 import environ
 
@@ -74,6 +74,11 @@ TEMPLATES = [
         },
     },
 ]
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=60)
+}
 
 WSGI_APPLICATION = 'Distrox.wsgi.application'
 
