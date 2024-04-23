@@ -58,6 +58,12 @@ class OrderAPIView(APIView):
         serializer = OrderSerializer(order)
         return Response(serializer.data)
 
+    def delete(self, request, pk):
+        order = get_object_or_404(Order.objects.all(), id=pk)
+        serializer = OrderSerializer(order)
+        order.delete()
+        return Response({"message": "deleted", "order": serializer.data})
+
     @swagger_auto_schema(request_body=OrderSerializer)
     def put(self, request, pk):
         saved_order = get_object_or_404(Order.objects.all(), id=pk)

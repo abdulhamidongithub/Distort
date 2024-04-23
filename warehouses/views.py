@@ -45,6 +45,12 @@ class WarehouseProductDetailAPIView(APIView):
         serializer = WarehouseProductSerializer(ware_product)
         return Response(serializer.data)
 
+    def delete(self, request, ware_pk, pr_pk):
+        warehouse_product = get_object_or_404(WarehouseProduct.objects.all(), id=pr_pk, warehouse__id=ware_pk)
+        serializer = WarehouseProductSerializer(warehouse_product)
+        warehouse_product.delete()
+        return Response({"message": "deleted", "warehouse_product": serializer.data})
+
 class WarehouseCustomersAPIView(APIView):
     def get(self, request, pk):
         warehouse_clients = CustomerStore.objects.filter(warehouse__id=pk)

@@ -31,6 +31,12 @@ class CustomerDetailView(APIView):
         serializer = CustomerStoreSerializer(customer)
         return Response(serializer.data)
 
+    def delete(self, request, pk):
+        customer = get_object_or_404(CustomerStore.objects.all(), id=pk)
+        serializer = CustomerStoreSerializer(customer)
+        customer.delete()
+        return Response({"message": "deleted", "customer": serializer.data})
+
     @swagger_auto_schema(request_body=CustomerStoreSerializer)
     def put(self, request, pk):
         customer = get_object_or_404(CustomerStore.objects.all(), id=pk)
