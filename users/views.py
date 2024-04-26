@@ -50,13 +50,19 @@ class UserAPIView2(APIView):
             return Response({"success": "false", "message": "User not found"}, status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(request_body=UserSerializer)
-    def put(self, request, pk):
-        saved_user = get_object_or_404(CustomUser.objects.all(), id=pk)
-        data = request.data
-        serializer = UserSerializer(instance=saved_user, data=data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            saved_user = serializer.save()
-        return Response({"User updated": saved_user})
+    def put(self, request, access_token):
+        try:
+            token = AccessToken(access_token)
+            user_id = token.payload['user_id']
+            saved_user = CustomUser.objects.get(id=user_id)
+            data = request.data
+            serializer = UserSerializer(instance=saved_user, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                saved_user = serializer.save()
+            return Response({"User updated": saved_user})
+        except Exception as e:
+            return Response({"success": "false", "message": "User not found"}, status.HTTP_400_BAD_REQUEST)
+
 
 class UserSalaryPaymentsAPIView(APIView):
     def get(self, request):

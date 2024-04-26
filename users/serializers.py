@@ -32,7 +32,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            'id', 'phone_number', "role", "username", "address",
+            'id', 'phone_number', "role", "username", "password", "address",
             "birth_date", "status", "warehouse", "is_available"
             ]
 
@@ -48,6 +48,7 @@ class UserSerializer(serializers.ModelSerializer):
         instance.phone_number = validated_data.get('phone_number', instance.phone_number)
         instance.role = validated_data.get('role', instance.role)
         instance.username = validated_data.get('username', instance.username)
+        instance.password = validated_data.get('password', instance.password)
         instance.warehouse = validated_data.get('warehouse', instance.warehouse)
         instance.address = validated_data.get('address', instance.address)
         instance.birth_date = validated_data.get('birth_date', instance.birth_date)
