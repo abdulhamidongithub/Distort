@@ -13,20 +13,36 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         username = attrs.get('username')
         password = attrs.get('password')
 
-        user = CustomUser.objects.filter(username=username, password=password).first()
+        try:
+            user = CustomUser.objects.get(username=username)
+        except CustomUser.DoesNotExist:
+            raise serializers.ValidationError({
+                'success': "false",
+                'message': 'User not found'
+            }, code=status.HTTP_400_BAD_REQUEST)
 
-        if user:
-            refresh = RefreshToken.for_user(user)
+        if not user.check_password(password):
+            raise serializers.ValidationError({
+                'success': "false",
+                'message': 'Incorrect password'
+            }, code=status.HTTP_400_BAD_REQUEST)
 
-            return {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }
+        refresh = RefreshToken.for_user(user)
 
-        raise serializers.ValidationError({
-            'success': "false",
-            'message': 'User not found'
-        }, code=status.HTTP_400_BAD_REQUEST)
+        return {
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            "username": username,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "phone": user.phone_number,
+            "role": user.role,
+            "address": user.address,
+            "birth_date": user.birth_date,
+            "warehouse": user.warehouse,
+            "status": user.status,
+            "is_available": user.is_available,
+        }
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

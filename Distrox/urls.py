@@ -25,6 +25,7 @@ urlpatterns = [
     path('orders/', include('orders.urls')),
     path('customers/', include('customers.urls')),
     path('products/', include('products.urls')),
+    path('warehouses/', include('warehouses.urls')),
 
     path('categories/', CategoriesAPIView.as_view()),
     path('category/<int:pk>/', CategoryDetailAPIView.as_view()),

@@ -37,6 +37,8 @@ class UserAPIView(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
+
+
 class UserAPIView2(APIView):
     # User details based on the token
     def get(self, request, access_token):
@@ -79,6 +81,14 @@ class CarUpdateAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             car = serializer.save()
         return Response({"Car updated": car})
+
+class CarAddAPIView(APIView):
+    @swagger_auto_schema(request_body=CarSerializer)
+    def post(self, request):
+        serializer = CarSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status.HTTP_200_OK)
 
 class ChangePasswordAPIView(APIView):
     @swagger_auto_schema(request_body=ChangePasswordSerializer)
