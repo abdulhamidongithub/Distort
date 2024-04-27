@@ -3,12 +3,22 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from .models import *
 from .serializers import *
 from warehouses.models import WarehouseProduct
+from users.models import CustomUser
 
 class OrdersAPIView(APIView):
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('date', openapi.IN_QUERY, description="Filter by date", type=openapi.TYPE_STRING),
+        openapi.Parameter('status', openapi.IN_QUERY, description="Filter by status", type=openapi.TYPE_STRING),
+        openapi.Parameter('customer', openapi.IN_QUERY, description="Filter by customer ID, name, address, or phone",
+                          type=openapi.TYPE_STRING),
+        openapi.Parameter('product', openapi.IN_QUERY, description="Filter by product ID or name",
+                          type=openapi.TYPE_STRING),
+    ])
     def get(self, request):
         orders = Order.objects.all()
         date = request.query_params.get("date")
@@ -74,8 +84,12 @@ class OrderAPIView(APIView):
         return Response({"Order updated": saved_order})
 
 class DriverOrdersAPIView(APIView):
-    def get(self, request):
-        driver = request.user
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('date', openapi.IN_QUERY, description="Filter by date", type=openapi.TYPE_STRING),
+        openapi.Parameter('status', openapi.IN_QUERY, description="Filter by status", type=openapi.TYPE_STRING)
+    ])
+    def get(self, request, driver_id):
+        driver = get_object_or_404(CustomUser.objects.all(), id=driver_id)
         orders = Order.objects.filter(driver=driver)
         date = request.query_params.get("date")
         status = request.query_params.get("status")
