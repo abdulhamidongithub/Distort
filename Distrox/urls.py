@@ -27,6 +27,7 @@ urlpatterns = [
     path('products/', include('products.urls')),
 
     path('categories/', CategoriesAPIView.as_view()),
+    path('category/<int:pk>/', CategoryDetailAPIView.as_view()),
     path('category/<int:pk>/products/', CategoryProductsAPIView.as_view()),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

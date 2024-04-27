@@ -52,3 +52,27 @@ class ProductDetailAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status.HTTP_202_ACCEPTED)
+
+    def delete(self, request, pk):
+        product = get_object_or_404(Product.objects.all(), id=pk)
+        product.delete()
+        return Response({"success": "true", "message": "Product deleted"}, status.HTTP_200_OK)
+
+class CategoryDetailAPIView(APIView):
+    def get(self, request, pk):
+        category = get_object_or_404(Category.objects.all(), id=pk)
+        serializer = CategorySerializer(category)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(request_body=ProductSerializer)
+    def put(self, request, pk):
+        category = get_object_or_404(Category.objects.all(), id=pk)
+        serializer = CategorySerializer(category, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status.HTTP_202_ACCEPTED)
+
+    def delete(self, request, pk):
+        category = get_object_or_404(Category.objects.all(), id=pk)
+        category.delete()
+        return Response({"success": "true", "message": "Category deleted"}, status.HTTP_200_OK)
