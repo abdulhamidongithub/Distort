@@ -3,13 +3,21 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from .models import *
 from .serializers import *
 
 class ProductsAPIView(APIView):
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('search', openapi.IN_QUERY, description="Search by name, about", type=openapi.TYPE_STRING)
+    ])
     def get(self, request):
         products = Product.objects.all()
+        search_word = request.query_params.get("search")
+        if search_word:
+            products = products.filter(name__icontains=search_word
+                        ) | products.filter(about__icontains=search_word)
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
 

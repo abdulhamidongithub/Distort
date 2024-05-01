@@ -5,6 +5,7 @@ from rest_framework.generics import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import AccessToken
+from drf_yasg import openapi
 
 from .models import *
 from .serializers import *
@@ -15,6 +16,9 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 class UsersAPIView(APIView):
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('role', openapi.IN_QUERY, description="Search by role", type=openapi.TYPE_STRING)
+    ])
     def get(self, request):
         users = CustomUser.objects.all()
         role = request.query_params.get("role")

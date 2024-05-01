@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from .models import *
 from customers.models import CustomerStore
@@ -66,6 +67,9 @@ class WarehouseCustomersAPIView(APIView):
         return Response(serializer.data, status.HTTP_200_OK)
 
 class WarehouseEmployeesAPIView(APIView):
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('role', openapi.IN_QUERY, description="Search by role", type=openapi.TYPE_STRING)
+    ])
     def get(self, request, pk):
         employees = CustomUser.objects.filter(
             warehouse__id = pk
