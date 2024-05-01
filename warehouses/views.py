@@ -4,13 +4,20 @@ from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from datetime import datetime, timedelta
+from django.utils import timezone
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 from .models import *
 from customers.models import CustomerStore
 from customers.serializers import CustomerStoreSerializer
 from users.models import CustomUser, Task
+from orders.models import Order
 from users.serializers import UserSerializer, TaskSerializer
+from orders.serializers import OrderSerializer
 from .serializers import *
+
 
 class WarehouseProductsAPIView(APIView):
     def get(self, request, pk):
@@ -99,3 +106,41 @@ class WarehousesAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status.HTTP_201_CREATED)
+
+class WarehouseDetailsView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, pk):
+        warehouse = get_object_or_404(Warehouse.objects.all(), id=pk)
+        today = timezone.now()
+        four_weeks_ago = today - timedelta(weeks=4)
+        orders = Order.objects.filter(
+            date_time__gte=four_weeks_ago,
+            warehouse = warehouse
+        ).order_by('-date_time')
+
+        warehouse_products = WarehouseProduct.objects.filter(warehouse=warehouse)
+        tasks = Task.objects.filter(
+            created_at__gte=four_weeks_ago,
+            task_executors__warehouse = warehouse
+        )
+        customers = CustomerStore.objects.filter(warehouse=warehouse)
+        users = CustomUser.objects.filter(warehouse=warehouse)
+        counts = {
+            "orders": orders.count(),
+            "tasks": tasks.count(),
+            "warehouse_products": warehouse_products.count(),
+            "customers": customers.count(),
+            "users": users.count()
+        }
+        context = {
+            "counts": counts,
+            "warehouse": WarehouseSerializer(warehouse).data,
+            "orders": OrderSerializer(orders, many=True).data,
+            "users": UserSerializer(users, many=True).data,
+            "warehouse_products": WarehouseProductGetSerializer(warehouse_products, many=True).data,
+            "customers": CustomerStoreSerializer(customers, many=True).data,
+            "tasks": TaskSerializer(tasks, many=True).data
+        }
+        return Response(context, status.HTTP_200_OK)
+

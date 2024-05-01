@@ -15,4 +15,7 @@ class WarehouseProductSerializer(serializers.Serializer):
     invalids_amount = serializers.IntegerField()
     comment = serializers.CharField()
 
-
+class WarehouseProductGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WarehouseProduct
+        fields = ['id', 'product', 'warehouse', 'amount', 'invalids_amount']

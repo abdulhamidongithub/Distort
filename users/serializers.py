@@ -3,6 +3,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from django.contrib.auth import authenticate
+from warehouses.serializers import WarehouseSerializer
 
 from .models import *
 
@@ -23,6 +24,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         refresh = RefreshToken.for_user(user)
 
+        if user.warehouse:
+            warehouse = WarehouseSerializer(user.warehouse).data
+        else:
+            warehouse = None
         return {
             'access': str(refresh.access_token),
             'refresh': str(refresh),
@@ -33,7 +38,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             "role": user.role,
             "address": user.address,
             "birth_date": user.birth_date,
-            "warehouse": user.warehouse,
+            "warehouse": warehouse,
             "status": user.status,
             "is_available": user.is_available,
         }
