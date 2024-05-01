@@ -21,6 +21,9 @@ class WarehouseProduct(models.Model):
     amount = models.IntegerField()
     invalids_amount = models.IntegerField(default=0)
 
+    class Meta:
+        unique_together = ('warehouse', 'product')
+
 class WarehouseProductArrival(models.Model):
     warehouse_product = models.ForeignKey(WarehouseProduct, on_delete=models.CASCADE)
     amount = models.IntegerField()

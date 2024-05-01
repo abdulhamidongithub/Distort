@@ -3,7 +3,7 @@ import uuid
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
-    status = models.CharField(max_length=30, blank=True, null=True)
+    status = models.CharField(max_length=30, blank=True, null=True, default="active")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -22,7 +22,7 @@ class Product(models.Model):
         blank=True
     )
     price = models.PositiveIntegerField()
-    status = models.CharField(max_length=30)
+    status = models.CharField(max_length=30, blank=True, null=True, default="active")
     created_at = models.DateTimeField(auto_now_add=True)
     category = models.ForeignKey(
         Category,

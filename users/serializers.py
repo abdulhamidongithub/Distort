@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
+from django.contrib.auth import authenticate
 
 from .models import *
 
@@ -13,18 +14,11 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         username = attrs.get('username')
         password = attrs.get('password')
 
-        try:
-            user = CustomUser.objects.get(username=username)
-        except CustomUser.DoesNotExist:
+        user = CustomUser.objects.filter(username=username, password=password).first()
+        if user is None:
             raise serializers.ValidationError({
                 'success': "false",
                 'message': 'User not found'
-            }, code=status.HTTP_400_BAD_REQUEST)
-
-        if not user.check_password(password):
-            raise serializers.ValidationError({
-                'success': "false",
-                'message': 'Incorrect password'
             }, code=status.HTTP_400_BAD_REQUEST)
 
         refresh = RefreshToken.for_user(user)
