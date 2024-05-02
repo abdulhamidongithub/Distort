@@ -11,6 +11,8 @@ from drf_yasg import openapi
 from datetime import datetime
 
 from .models import *
+from orders.models import Order
+from orders.serializers import OrderSerializer
 from .serializers import *
 
 
@@ -64,10 +66,18 @@ class UserAPIView2(APIView):
             user_id = token.payload['user_id']
             saved_user = CustomUser.objects.get(id=user_id)
             data = request.data
+            if saved_user.is_available or data.get("is_available") == False:
+                orders = Order.objects.filter(driver = saved_user, status = 'Active')
+                if orders:
+                    return Response({
+                        "success": "false", "message": "Active orderlar mavjud",
+                        "orders": OrderSerializer(orders, many=True).data
+                    }, status.HTTP_400_BAD_REQUEST)
             serializer = UserSerializer(instance=saved_user, data=data, partial=True)
-            if serializer.is_valid(raise_exception=True):
-                saved_user = serializer.save()
-            return Response({"User updated": saved_user})
+            serializer.is_valid(raise_exception=True)
+            saved_user = serializer.save()
+            saved_user = UserSerializer(saved_user).data
+            return Response(saved_user)
         except Exception as e:
             return Response({"success": "false", "message": "User not found"}, status.HTTP_400_BAD_REQUEST)
 

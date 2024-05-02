@@ -78,9 +78,10 @@ class OrderAPIView(APIView):
         saved_order = get_object_or_404(Order.objects.all(), id=pk)
         data = request.data
         serializer = OrderSerializer(instance=saved_order, data=data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            saved_order = serializer.save()
-        return Response({"Order updated": saved_order})
+        serializer.is_valid(raise_exception=True)
+        saved_order = serializer.save()
+        saved_order = OrderSerializer(saved_order).data
+        return Response(saved_order)
 
 class DriverOrdersAPIView(APIView):
     @swagger_auto_schema(manual_parameters=[
@@ -89,6 +90,8 @@ class DriverOrdersAPIView(APIView):
     ])
     def get(self, request, driver_id):
         driver = get_object_or_404(CustomUser.objects.all(), id=driver_id)
+        if not driver.is_available:
+            return Response({"success":"false", "message": "Driver is not available"})
         orders = Order.objects.filter(driver=driver)
         date = request.query_params.get("date")
         order_status = request.query_params.get("status")
