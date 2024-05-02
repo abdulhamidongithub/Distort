@@ -6,6 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from products.views import *
+from users.views import TasksAllAPIView
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -28,6 +29,7 @@ urlpatterns = [
     path('warehouses/', include('warehouses.urls')),
 
     path('categories/', CategoriesAPIView.as_view()),
+    path('tasks/all/', TasksAllAPIView.as_view()),
     path('category/<int:pk>/', CategoryDetailAPIView.as_view()),
     path('category/<int:pk>/products/', CategoryProductsAPIView.as_view()),
 

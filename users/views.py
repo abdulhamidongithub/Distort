@@ -8,6 +8,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from drf_yasg import openapi
+from datetime import datetime
 
 from .models import *
 from .serializers import *
@@ -141,6 +142,33 @@ class UserAssignedTasks(APIView):
         task_status = request.query_params.get("status")
         if task_status:
             tasks = tasks.filter(status = task_status)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+class TasksAllAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('status', openapi.IN_QUERY, description="Search by status", type=openapi.TYPE_STRING),
+        openapi.Parameter('date_from', openapi.IN_QUERY, description="Search by date_from", type=openapi.TYPE_STRING),
+        openapi.Parameter('date_to', openapi.IN_QUERY, description="Search by date_to", type=openapi.TYPE_STRING),
+        openapi.Parameter('single_date', openapi.IN_QUERY, description="Search by single_date", type=openapi.TYPE_STRING)
+    ])
+    def get(self, request):
+        task_status = request.query_params.get("status")
+        date_from = request.query_params.get("date_from")
+        date_to = request.query_params.get("date_to")
+        single_date = request.query_params.get("single_date")
+        tasks = Task.objects.all()
+        if task_status:
+            tasks = tasks.filter(status = task_status)
+        if single_date:
+            tasks = tasks.filter(created_at = single_date)
+        if date_to and date_from:
+            date_from = datetime.strptime(date_from, "%Y-%m-%d")
+            date_to = datetime.strptime(date_to, "%Y-%m-%d")
+            tasks = tasks.filter(created_at__range=[date_from, date_to])
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
