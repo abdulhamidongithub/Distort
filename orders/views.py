@@ -22,7 +22,7 @@ class OrdersAPIView(APIView):
     def get(self, request):
         orders = Order.objects.all()
         date = request.query_params.get("date")
-        status = request.query_params.get("status")
+        order_status = request.query_params.get("status")
         customer = request.query_params.get("customer")
         product = request.query_params.get("product")
         if customer:
@@ -35,8 +35,8 @@ class OrdersAPIView(APIView):
                 ) | orders.filter( product__name__icontains = product)
         if date:
             orders = orders.filter(date_time__startswith=date)
-        if status:
-            orders = orders.filter(status=status)
+        if order_status:
+            orders = orders.filter(status=order_status)
         counts = {
             "active": orders.filter(status="Active").count(),
             "delivered": orders.filter(status="Delivered").count(),
@@ -47,8 +47,7 @@ class OrdersAPIView(APIView):
             {
                 "counts": counts,
                 "orders": serializer.data,
-            },
-            status.HTTP_200_OK
+            }
         )
 
     @swagger_auto_schema(request_body=OrderSerializer)
@@ -92,11 +91,11 @@ class DriverOrdersAPIView(APIView):
         driver = get_object_or_404(CustomUser.objects.all(), id=driver_id)
         orders = Order.objects.filter(driver=driver)
         date = request.query_params.get("date")
-        status = request.query_params.get("status")
+        order_status = request.query_params.get("status")
         if date:
             orders = orders.filter(date_time__startswith=date)
-        if status:
-            orders = orders.filter(status=status)
+        if order_status:
+            orders = orders.filter(status=order_status)
         counts = {
             "active": orders.filter(status="Active").count(),
             "delivered": orders.filter(status="Delivered").count(),
@@ -107,6 +106,5 @@ class DriverOrdersAPIView(APIView):
             {
                 "counts": counts,
                 "orders": serializer.data,
-            },
-            status.HTTP_200_OK
+            }
         )

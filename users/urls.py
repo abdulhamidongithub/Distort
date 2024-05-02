@@ -15,5 +15,7 @@ urlpatterns = [
     path('car/<str:pk>/', CarUpdateAPIView.as_view()),
     path('car_create/', CarAddAPIView.as_view()),
     path('task_create/', TaskCreateAPIView.as_view()),
+    path('olgan_tasklari/', UserReceivedTasks.as_view()),
+    path('bergan_tasklari/', UserAssignedTasks.as_view()),
 ]
 

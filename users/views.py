@@ -5,6 +5,8 @@ from rest_framework.generics import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 from drf_yasg import openapi
 
 from .models import *
@@ -111,4 +113,34 @@ class TaskCreateAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status.HTTP_201_CREATED)
+
+class UserReceivedTasks(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('status', openapi.IN_QUERY, description="Search by status", type=openapi.TYPE_STRING)
+    ])
+    def get(self, request, pk):
+        user = get_object_or_404(CustomUser.objects.all(), id=pk)
+        tasks = Task.objects.filter(task_executors = user)
+        task_status = request.query_params.get("status")
+        if task_status:
+            tasks = tasks.filter(status = task_status)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+class UserAssignedTasks(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('status', openapi.IN_QUERY, description="Search by status", type=openapi.TYPE_STRING)
+    ])
+    def get(self, request, pk):
+        user = get_object_or_404(CustomUser.objects.all(), id=pk)
+        tasks = Task.objects.filter(task_setter = user)
+        task_status = request.query_params.get("status")
+        if task_status:
+            tasks = tasks.filter(status = task_status)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
 
