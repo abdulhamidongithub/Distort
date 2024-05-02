@@ -189,3 +189,26 @@ class TasksAllAPIView(APIView):
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
+class UserSalaryParamsView(APIView):
+    def get(self, request, pk):
+        user = get_object_or_404(CustomUser.objects.all(), id=pk)
+        salary_params = get_object_or_404(SalaryParams.objects.all(), user=user)
+        serializer = SalaryParamsSerializer(salary_params)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(request_body=SalaryParamsSerializer)
+    def post(self, request, pk):
+        user = get_object_or_404(CustomUser.objects.all(), id=pk)
+        salary_params_data = request.data
+        existing_salary_params = SalaryParams.objects.filter(user=user).first()
+        if existing_salary_params:
+            serializer = SalaryParamsSerializer(instance=existing_salary_params, data=salary_params_data)
+        else:
+            serializer = SalaryParamsSerializer(data=salary_params_data)
+
+        serializer.is_valid(raise_exception=True)
+        salary_params = serializer.save(user=user)
+        serializer = SalaryParamsSerializer(salary_params)
+        return Response(serializer.data)
+
+

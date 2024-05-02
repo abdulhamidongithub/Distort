@@ -17,5 +17,6 @@ urlpatterns = [
     path('task_create/', TaskCreateAPIView.as_view()),
     path('olgan_tasklari/', UserReceivedTasks.as_view()),
     path('bergan_tasklari/', UserAssignedTasks.as_view()),
+    path('<str:pk>/salary_params/', UserSalaryParamsView.as_view()),
 ]
 

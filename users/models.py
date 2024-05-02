@@ -46,7 +46,7 @@ class CustomUser(AbstractUser):
         return f"{self.first_name} {self.last_name} ({self.role})"
 
 class SalaryParams(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    user = models.OneToOneField(CustomUser, on_delete=models.SET_NULL, null=True)
     fixed = models.PositiveIntegerField()
     kpi_by_sales = models.FloatField()
     comment = models.TextField(null=True, blank=True)

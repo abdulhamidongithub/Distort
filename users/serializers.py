@@ -76,6 +76,11 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
+class SalaryParamsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SalaryParams
+        fields = '__all__'
+
 class SalaryPaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalaryPayment
