@@ -18,7 +18,7 @@ class Order(models.Model):
     warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True)
     driver = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="driver_orders")
     amount = models.IntegerField()
-    deadline = models.DateTimeField()
+    deadline = models.DateTimeField(blank=True, null=True)
     date_time = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, null=True)
     status = models.CharField(

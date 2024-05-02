@@ -45,7 +45,6 @@ class UserAPIView(APIView):
         return Response(serializer.data)
 
 
-
 class UserAPIView2(APIView):
     # User details based on the token
     def get(self, request, access_token):
@@ -153,13 +152,17 @@ class TasksAllAPIView(APIView):
         openapi.Parameter('status', openapi.IN_QUERY, description="Search by status", type=openapi.TYPE_STRING),
         openapi.Parameter('date_from', openapi.IN_QUERY, description="Search by date_from", type=openapi.TYPE_STRING),
         openapi.Parameter('date_to', openapi.IN_QUERY, description="Search by date_to", type=openapi.TYPE_STRING),
-        openapi.Parameter('single_date', openapi.IN_QUERY, description="Search by single_date", type=openapi.TYPE_STRING)
+        openapi.Parameter('single_date', openapi.IN_QUERY, description="Search by single_date", type=openapi.TYPE_STRING),
+        openapi.Parameter('warehouse_id', openapi.IN_QUERY, description="Search by warehouse id", type=openapi.TYPE_STRING),
+        openapi.Parameter('role', openapi.IN_QUERY, description="Search by role", type=openapi.TYPE_STRING),
     ])
     def get(self, request):
         task_status = request.query_params.get("status")
         date_from = request.query_params.get("date_from")
         date_to = request.query_params.get("date_to")
         single_date = request.query_params.get("single_date")
+        warehouse_id = request.query_params.get("warehouse_id")
+        role = request.query_params.get("role")
         tasks = Task.objects.all()
         if task_status:
             tasks = tasks.filter(status = task_status)
@@ -169,6 +172,10 @@ class TasksAllAPIView(APIView):
             date_from = datetime.strptime(date_from, "%Y-%m-%d")
             date_to = datetime.strptime(date_to, "%Y-%m-%d")
             tasks = tasks.filter(created_at__range=[date_from, date_to])
+        if role:
+            tasks = tasks.filter(task_executors__role = role)
+        if warehouse_id:
+            tasks = tasks.filter(task_executors__warehouse__id = warehouse_id)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
