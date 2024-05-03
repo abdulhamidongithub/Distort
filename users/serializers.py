@@ -112,21 +112,20 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
 
         instance.password = validated_data.get('password', instance.password)
-
         if not validated_data['new_password']:
               raise serializers.ValidationError({'new_password': 'not found'})
 
         if not validated_data['old_password']:
               raise serializers.ValidationError({'old_password': 'not found'})
 
-        if not instance.check_password(validated_data['old_password']):
+        if instance.password != validated_data['old_password']:
               raise serializers.ValidationError({'old_password': 'wrong password'})
 
         if validated_data['new_password'] != validated_data['re_new_password']:
             raise serializers.ValidationError({'passwords': 'passwords do not match'})
 
-        if validated_data['new_password'] == validated_data['re_new_password'] and instance.check_password(validated_data['old_password']):
-            instance.set_password(validated_data['new_password'])
+        if validated_data['new_password'] == validated_data['re_new_password'] and instance.password == validated_data['old_password']:
+            instance.password = validated_data['new_password']
             instance.save()
             return instance
 

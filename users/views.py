@@ -75,9 +75,8 @@ class UserAPIView2(APIView):
                     }, status.HTTP_400_BAD_REQUEST)
             serializer = UserSerializer(instance=saved_user, data=data, partial=True)
             serializer.is_valid(raise_exception=True)
-            saved_user = serializer.save()
-            saved_user = UserSerializer(saved_user).data
-            return Response(saved_user)
+            serializer.save()
+            return Response(serializer.data)
         except Exception as e:
             return Response({"success": "false", "message": "User not found"}, status.HTTP_400_BAD_REQUEST)
 
@@ -108,6 +107,8 @@ class CarAddAPIView(APIView):
         return Response(serializer.errors, status.HTTP_406_NOT_ACCEPTABLE)
 
 class ChangePasswordAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(request_body=ChangePasswordSerializer)
     def put(self, request):
         serializer = ChangePasswordSerializer(instance=self.request.user, data=request.data)
