@@ -21,6 +21,8 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 class UsersAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(manual_parameters=[
         openapi.Parameter('role', openapi.IN_QUERY, description="Search by role", type=openapi.TYPE_STRING)
     ])
@@ -41,9 +43,27 @@ class UsersAPIView(APIView):
         return Response(serializer.data, status.HTTP_201_CREATED)
 
 class UserAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk):
         user = get_object_or_404(CustomUser.objects.all(), id=pk)
         serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(request_body=UserSerializer)
+    def put(self, request, pk):
+        saved_user = get_object_or_404(CustomUser.objects.all(), id=pk)
+        data = request.data
+        if saved_user.is_available or data.get("is_available") == False:
+            orders = Order.objects.filter(driver=saved_user, status='Active')
+            if orders:
+                return Response({
+                    "success": "false", "message": "Active orderlar mavjud",
+                    "orders": OrderSerializer(orders, many=True).data
+                }, status.HTTP_400_BAD_REQUEST)
+        serializer = UserSerializer(instance=saved_user, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data)
 
 
@@ -82,6 +102,8 @@ class UserAPIView2(APIView):
 
 
 class UserSalaryPaymentsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         user = request.user
         salary_payments = SalaryPayment.objects.filter(user=user)
@@ -89,6 +111,8 @@ class UserSalaryPaymentsAPIView(APIView):
         return Response(serializer.data, status.HTTP_200_OK)
 
 class CarUpdateAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(request_body=CarSerializer)
     def put(self, request, pk):
         car = get_object_or_404(Car.objects.all(), id=pk)
@@ -98,6 +122,8 @@ class CarUpdateAPIView(APIView):
         return Response({"Car updated": car})
 
 class CarAddAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(request_body=CarSerializer)
     def post(self, request):
         serializer = CarSerializer(data=request.data)
@@ -118,6 +144,8 @@ class ChangePasswordAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TaskCreateAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(request_body=TaskSerializer)
     def post(self, request):
         serializer = TaskSerializer(data=request.data)
@@ -191,6 +219,8 @@ class TasksAllAPIView(APIView):
         return Response(serializer.data, status.HTTP_200_OK)
 
 class UserSalaryParamsView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk):
         user = get_object_or_404(CustomUser.objects.all(), id=pk)
         salary_params = get_object_or_404(SalaryParams.objects.all(), user=user)
