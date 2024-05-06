@@ -18,5 +18,7 @@ urlpatterns = [
     path('olgan_tasklari/<str:pk>/', UserReceivedTasks.as_view()),
     path('bergan_tasklari/<str:pk>/', UserAssignedTasks.as_view()),
     path('<str:pk>/salary_params/', UserSalaryParamsView.as_view()),
+    path('salary/<str:pk>/<int:year>/<str:month>/', CalculateUserSalary.as_view()),
+    path('pay_salary/', UserSalaryPayView.as_view()),
 ]
 

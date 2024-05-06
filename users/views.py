@@ -9,9 +9,10 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from drf_yasg import openapi
 from datetime import datetime
+from django.db.models import Sum
 
 from .models import *
-from orders.models import Order
+from orders.models import Order, KPIEarning
 from orders.serializers import OrderSerializer
 from .serializers import *
 
@@ -242,4 +243,56 @@ class UserSalaryParamsView(APIView):
         serializer = SalaryParamsSerializer(salary_params)
         return Response(serializer.data)
 
+
+class CalculateUserSalary(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, pk, year, month):
+        user = get_object_or_404(CustomUser.objects.all(), id=pk)
+        the_date = self.get_the_month(month, year)
+        if not the_date:
+            return Response({"success": "false", "message": "Month name is incorrect"})
+        salary_params = get_object_or_404(SalaryParams.objects.all(), user=user)
+        kpi_earnings_sum = KPIEarning.objects.filter(
+            user=user,
+            date__startswith=the_date
+        ).aggregate(total_amount=Sum('amount')).get('total_amount', 0)
+        data = {
+            "user": UserSerializer(user).data,
+            "kpi_amount": kpi_earnings_sum,
+            "fixed_amount": salary_params.fixed,
+            "total_amount": kpi_earnings_sum + salary_params.fixed
+        }
+        return Response(data)
+
+    def get_the_month(self, month, year):
+        months = {
+            "january": "01",
+            "february": "02",
+            "march": "03",
+            "april": "04",
+            "may": "05",
+            "june": "06",
+            "july": "07",
+            "august": "08",
+            "september": "09",
+            "october": "10",
+            "november": "11",
+            "december": "12"
+        }
+        month = months.get(month.lower())
+        if not month:
+            return 0
+        return f"{year}-{month}"
+
+class UserSalaryPayView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(request_body=SalaryPaymentSerializer)
+    def post(self, request):
+        data = request.data
+        serializer = SalaryPaymentSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(payer=request.user)
+        return Response(serializer.data)
 

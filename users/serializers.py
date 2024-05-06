@@ -85,6 +85,10 @@ class SalaryPaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalaryPayment
         fields = '__all__'
+        extra_kwargs = {
+            'paid_at': {'required': False},
+            'payer': {'required': False}
+        }
 
 class CarSerializer(serializers.ModelSerializer):
     class Meta:

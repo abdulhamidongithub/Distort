@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 import uuid
+
 from warehouses.models import Warehouse
 
 ROLES = [
@@ -57,9 +59,14 @@ class SalaryParams(models.Model):
 class SalaryPayment(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="user_salary_payments")
     payer = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="payer_payments")
-    amount = models.FloatField()
-    paid_at = models.DateTimeField()
+    kpi_amount = models.FloatField(default=0)
+    fixed_amount = models.FloatField(default=0)
+    bonus = models.FloatField(default=0)
+    total_amount = models.FloatField()
+    paid_at = models.DateTimeField(default=timezone.now)
     comment = models.TextField(null=True, blank=True)
+    month = models.CharField(max_length=10, blank=True, null=True)
+    year = models.PositiveSmallIntegerField(default=2024)
 
 class Car(models.Model):
     type = models.CharField(max_length=50)

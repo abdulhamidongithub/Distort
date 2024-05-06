@@ -26,7 +26,7 @@ class SalaryParamsAdmin(admin.ModelAdmin):
     list_per_page = 30
 
 class SalaryPaymentAdmin(admin.ModelAdmin):
-    list_display = ["id", "user", "payer", 'amount', "paid_at"]
+    list_display = ["id", "user", "payer", 'total_amount', "paid_at"]
     list_filter = ["user", "payer"]
     search_fields = ["user", "payer", "paid_at"]
     list_per_page = 30
