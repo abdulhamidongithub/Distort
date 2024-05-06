@@ -293,6 +293,17 @@ class UserSalaryPayView(APIView):
         data = request.data
         serializer = SalaryPaymentSerializer(data=data)
         serializer.is_valid(raise_exception=True)
+        existing_payment = SalaryPayment.objects.filter(
+            user = serializer.validated_data['user'],
+            month = serializer.validated_data['month'],
+            year = serializer.validated_data['year']
+        ).exists()
+        if existing_payment:
+            return Response({
+                "success": "false",
+                "message": "Salary payment for this user and month already exists.",
+                "salary_payment": SalaryPaymentSerializer(existing_payment).data
+            }, status=status.HTTP_400_BAD_REQUEST)
         serializer.save(payer=request.user)
         return Response(serializer.data)
 
