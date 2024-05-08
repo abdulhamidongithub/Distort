@@ -57,8 +57,8 @@ class OrdersAPIView(APIView):
         if product.amount < order.amount:
             return Response({"success": "false", "message": f"Miqdor yetarli emas. Mavjud miqdor: {product.amount}"})
         serializer = OrderSerializer(data=order)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status.HTTP_201_CREATED)
 
 class OrderAPIView(APIView):

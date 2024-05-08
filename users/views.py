@@ -55,7 +55,7 @@ class UserAPIView(APIView):
     def put(self, request, pk):
         saved_user = get_object_or_404(CustomUser.objects.all(), id=pk)
         data = request.data
-        if saved_user.is_available or data.get("is_available") == False:
+        if saved_user.is_available and data.get("is_available") == False:
             orders = Order.objects.filter(driver=saved_user, status='Active')
             if orders:
                 return Response({
@@ -87,7 +87,7 @@ class UserAPIView2(APIView):
             user_id = token.payload['user_id']
             saved_user = CustomUser.objects.get(id=user_id)
             data = request.data
-            if saved_user.is_available or data.get("is_available") == False:
+            if saved_user.is_available and data.get("is_available") == False:
                 orders = Order.objects.filter(driver = saved_user, status = 'Active')
                 if orders:
                     return Response({
@@ -151,7 +151,7 @@ class TaskCreateAPIView(APIView):
     def post(self, request):
         serializer = TaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer.save(task_setter = request.user)
         return Response(serializer.data, status.HTTP_201_CREATED)
 
 class UserReceivedTasks(APIView):

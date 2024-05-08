@@ -9,6 +9,7 @@ from warehouses.models import Warehouse, WarehouseProduct
 
 STATUSES = [
     ("Active", "Active"),
+    ("InProgress", "InProgress"),
     ("Delivered", "Delivered"),
     ("Confirmed", "Confirmed"),
     ("Cancelled", "Cancelled"),
