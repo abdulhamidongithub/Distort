@@ -8,12 +8,11 @@ class WarehouseSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class WarehouseProductSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
-    product = serializers.IntegerField()
-    warehouse = serializers.IntegerField()
+    product = serializers.UUIDField()
+    warehouse = serializers.UUIDField()
     amount = serializers.IntegerField()
-    invalids_amount = serializers.IntegerField()
-    comment = serializers.CharField()
+    invalids_amount = serializers.IntegerField(default=0)
+    comment = serializers.CharField(required=False)
 
 class WarehouseProductGetSerializer(serializers.ModelSerializer):
     class Meta:

@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import *
 from customers.models import CustomerStore
+from products.models import Product
 from customers.serializers import CustomerStoreSerializer
 from users.models import CustomUser, Task
 from orders.models import Order
@@ -31,9 +32,11 @@ class WarehouseProductCreteOrUpdate(APIView):
         serializer = WarehouseProductSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
+        warehouse = get_object_or_404(Warehouse.objects.all(), id=validated_data['warehouse'])
+        product = get_object_or_404(Product.objects.all(), id=validated_data['product'])
         warehouse_product, created = WarehouseProduct.objects.get_or_create(
-            warehouse=validated_data['warehouse'],
-            product=validated_data['product'],
+            warehouse=warehouse,
+            product=product,
             defaults={'amount': validated_data['amount']}
         )
         if not created:
@@ -42,7 +45,7 @@ class WarehouseProductCreteOrUpdate(APIView):
         WarehouseProductArrival.objects.create(
             warehouse_product=warehouse_product,
             amount=validated_data['amount'],
-            comment=validated_data['comment']
+            comment=validated_data.get("comment", None)
         )
         serializer = WarehouseProductSerializer(warehouse_product)
         return Response({"warehouse_product": serializer.data})
