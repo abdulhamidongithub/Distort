@@ -39,8 +39,13 @@ class UsersAPIView(APIView):
     def post(self, request):
         user = request.data
         serializer = UserSerializer(data=user)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        SalaryParams.objects.create(
+            user = user,
+            fixed = 0,
+            kpi_by_sales = 0
+        )
         return Response(serializer.data, status.HTTP_201_CREATED)
 
 class UserAPIView(APIView):
@@ -110,6 +115,25 @@ class UserSalaryPaymentsAPIView(APIView):
         salary_payments = SalaryPayment.objects.filter(user=user)
         serializer = SalaryPaymentSerializer(salary_payments, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
+
+    @swagger_auto_schema(request_body=SalaryPaymentSerializer)
+    def post(self, request):
+        data = request.data
+        serializer = SalaryPaymentSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        existing_payment = SalaryPayment.objects.filter(
+            user=serializer.validated_data['user'],
+            month=serializer.validated_data['month'],
+            year=serializer.validated_data['year']
+        ).exists()
+        if existing_payment:
+            return Response({
+                "success": "false",
+                "message": "Salary payment for this user and month already exists.",
+                "salary_payment": SalaryPaymentSerializer(existing_payment).data
+            }, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save(payer=request.user)
+        return Response(serializer.data)
 
 class CarUpdateAPIView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -284,26 +308,3 @@ class CalculateUserSalary(APIView):
         if not month:
             return 0
         return f"{year}-{month}"
-
-class UserSalaryPayView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    @swagger_auto_schema(request_body=SalaryPaymentSerializer)
-    def post(self, request):
-        data = request.data
-        serializer = SalaryPaymentSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        existing_payment = SalaryPayment.objects.filter(
-            user = serializer.validated_data['user'],
-            month = serializer.validated_data['month'],
-            year = serializer.validated_data['year']
-        ).exists()
-        if existing_payment:
-            return Response({
-                "success": "false",
-                "message": "Salary payment for this user and month already exists.",
-                "salary_payment": SalaryPaymentSerializer(existing_payment).data
-            }, status=status.HTTP_400_BAD_REQUEST)
-        serializer.save(payer=request.user)
-        return Response(serializer.data)
-

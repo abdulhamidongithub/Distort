@@ -11,7 +11,7 @@ class WarehouseProductSerializer(serializers.Serializer):
     product = serializers.UUIDField()
     warehouse = serializers.UUIDField()
     amount = serializers.IntegerField()
-    invalids_amount = serializers.IntegerField(default=0)
+    invalids_amount = serializers.IntegerField(required=False)
     comment = serializers.CharField(required=False)
 
 class WarehouseProductGetSerializer(serializers.ModelSerializer):
