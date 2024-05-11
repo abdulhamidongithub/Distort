@@ -72,6 +72,11 @@ class UserAPIView(APIView):
         serializer.save()
         return Response(serializer.data)
 
+    def delete(self, request, pk):
+        user = get_object_or_404(CustomUser.objects.all(), id=pk)
+        serializer = UserSerializer(user)
+        user.delete()
+        return Response({"success": "true", "message": "deleted", "user": serializer.data})
 
 class UserAPIView2(APIView):
     # User details based on the token
@@ -275,7 +280,7 @@ class CalculateUserSalary(APIView):
         user = get_object_or_404(CustomUser.objects.all(), id=pk)
         the_date = self.get_the_month(month, year)
         if not the_date:
-            return Response({"success": "false", "message": "Month name is incorrect"})
+            return Response({"success": "false", "message": "Month numbering is incorrect"})
         salary_params = get_object_or_404(SalaryParams.objects.all(), user=user)
         kpi_earnings_sum = KPIEarning.objects.filter(
             user=user,
@@ -291,20 +296,20 @@ class CalculateUserSalary(APIView):
 
     def get_the_month(self, month, year):
         months = {
-            "january": "01",
-            "february": "02",
-            "march": "03",
-            "april": "04",
-            "may": "05",
-            "june": "06",
-            "july": "07",
-            "august": "08",
-            "september": "09",
-            "october": "10",
-            "november": "11",
-            "december": "12"
+            "1": "01",
+            "2": "02",
+            "3": "03",
+            "4": "04",
+            "5": "05",
+            "6": "06",
+            "7": "07",
+            "8": "08",
+            "9": "09",
+            "10": "10",
+            "11": "11",
+            "12": "12"
         }
-        month = months.get(month.lower())
+        month = months.get(month)
         if not month:
-            return 0
+            return None
         return f"{year}-{month}"
