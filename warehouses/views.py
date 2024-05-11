@@ -147,3 +147,10 @@ class WarehouseDetailsView(APIView):
         }
         return Response(context, status.HTTP_200_OK)
 
+    def delete(self, request, pk):
+        warehouse = get_object_or_404(Warehouse.objects.all(), id=pk)
+        serializer = WarehouseSerializer(warehouse)
+        warehouse.delete()
+        return Response({"message": "deleted", "warehouse": serializer.data})
+
+
