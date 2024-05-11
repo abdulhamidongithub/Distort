@@ -43,7 +43,8 @@ class OrdersAPIView(APIView):
         counts = {
             "active": orders.filter(status="Active").count(),
             "delivered": orders.filter(status="Delivered").count(),
-            "cancelled": orders.filter(status="Cancelled").count()
+            "cancelled": orders.filter(status="Cancelled").count(),
+            "in_progress": orders.filter(status="InProgress").count()
         }
         serializer = OrderSerializer(orders, many=True)
         return Response(
@@ -72,9 +73,8 @@ class OrderAPIView(APIView):
 
     def delete(self, request, pk):
         order = get_object_or_404(Order.objects.all(), id=pk)
-        serializer = OrderSerializer(order)
         order.delete()
-        return Response({"message": "deleted", "order": serializer.data})
+        return Response({"message": "deleted", "message": "Order deleted"})
 
     @swagger_auto_schema(request_body=OrderSerializer)
     def put(self, request, pk):
@@ -108,7 +108,8 @@ class DriverOrdersAPIView(APIView):
         counts = {
             "active": orders.filter(status="Active").count(),
             "delivered": orders.filter(status="Delivered").count(),
-            "cancelled": orders.filter(status="Cancelled").count()
+            "cancelled": orders.filter(status="Cancelled").count(),
+            "in_progress": orders.filter(status="InProgress").count()
         }
         serializer = OrderSerializer(orders, many=True)
         return Response(

@@ -74,9 +74,8 @@ class UserAPIView(APIView):
 
     def delete(self, request, pk):
         user = get_object_or_404(CustomUser.objects.all(), id=pk)
-        serializer = UserSerializer(user)
         user.delete()
-        return Response({"success": "true", "message": "deleted", "user": serializer.data})
+        return Response({"success": "true", "message": "deleted"})
 
 class UserAPIView2(APIView):
     # User details based on the token
@@ -251,9 +250,8 @@ class TasksAllAPIView(APIView):
 class TaskDeleteAPIView(APIView):
     def delete(self, request, pk):
         task = get_object_or_404(Task.objects.all(), id=pk)
-        serializer = TaskSerializer(task)
         task.delete()
-        return Response({"message": "deleted", "task": serializer.data})
+        return Response({"message": "deleted", "message": "Task deleted"})
 
 class UserSalaryParamsView(APIView):
     authentication_classes = [JWTAuthentication]

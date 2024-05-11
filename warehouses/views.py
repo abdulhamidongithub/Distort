@@ -58,9 +58,8 @@ class WarehouseProductDetailAPIView(APIView):
 
     def delete(self, request, ware_pk, pr_pk):
         warehouse_product = get_object_or_404(WarehouseProduct.objects.all(), id=pr_pk, warehouse__id=ware_pk)
-        serializer = WarehouseProductSerializer(warehouse_product)
         warehouse_product.delete()
-        return Response({"message": "deleted", "warehouse_product": serializer.data})
+        return Response({"success" :"true", "message": "deleted"})
 
 class WarehouseCustomersAPIView(APIView):
     def get(self, request, pk):
@@ -149,8 +148,7 @@ class WarehouseDetailsView(APIView):
 
     def delete(self, request, pk):
         warehouse = get_object_or_404(Warehouse.objects.all(), id=pk)
-        serializer = WarehouseSerializer(warehouse)
         warehouse.delete()
-        return Response({"message": "deleted", "warehouse": serializer.data})
+        return Response({"message": "deleted", "message": "Warehouse deleted"})
 
 
