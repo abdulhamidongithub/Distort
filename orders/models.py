@@ -49,3 +49,5 @@ class KPIEarning(models.Model):
     amount = models.FloatField()
     date = models.DateField(default=timezone.now)
 
+    class Meta:
+        unique_together = ('order', 'user')

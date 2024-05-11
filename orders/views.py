@@ -25,6 +25,11 @@ class OrdersAPIView(APIView):
         order_status = request.query_params.get("status")
         customer = request.query_params.get("customer")
         product = request.query_params.get("product")
+        if order_status:
+            order_status = order_status.split("-")
+            orders = orders.filter(status = order_status[0])
+            for status in order_status[1:]:
+                orders = orders | Order.objects.filter(status=status)
         if customer:
             orders = orders.filter( customer__id = customer
                 ) | orders.filter( customer__name__icontains = customer
@@ -35,8 +40,6 @@ class OrdersAPIView(APIView):
                 ) | orders.filter( product__name__icontains = product)
         if date:
             orders = orders.filter(date_time__startswith=date)
-        if order_status:
-            orders = orders.filter(status=order_status)
         counts = {
             "active": orders.filter(status="Active").count(),
             "delivered": orders.filter(status="Delivered").count(),
@@ -95,10 +98,13 @@ class DriverOrdersAPIView(APIView):
         orders = Order.objects.filter(driver=driver)
         date = request.query_params.get("date")
         order_status = request.query_params.get("status")
+        if order_status:
+            order_status = order_status.split("-")
+            orders = orders.filter(status = order_status[0])
+            for status in order_status[1:]:
+                orders = orders | Order.objects.filter(status=status)
         if date:
             orders = orders.filter(date_time__startswith=date)
-        if order_status:
-            orders = orders.filter(status=order_status)
         counts = {
             "active": orders.filter(status="Active").count(),
             "delivered": orders.filter(status="Delivered").count(),
