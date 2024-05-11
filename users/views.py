@@ -248,6 +248,13 @@ class TasksAllAPIView(APIView):
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
+class TaskDeleteAPIView(APIView):
+    def delete(self, request, pk):
+        task = get_object_or_404(Task.objects.all(), id=pk)
+        serializer = TaskSerializer(task)
+        task.delete()
+        return Response({"message": "deleted", "task": serializer.data})
+
 class UserSalaryParamsView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
