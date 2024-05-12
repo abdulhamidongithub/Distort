@@ -45,6 +45,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
 
 class UserSerializer(serializers.ModelSerializer):
+    warehouse = WarehouseSerializer(read_only=True)
     class Meta:
         model = CustomUser
         fields = [
@@ -60,29 +61,16 @@ class UserSerializer(serializers.ModelSerializer):
             data.update({"car": serializer.data})
         return data
 
-    def update(self, instance, validated_data):
-        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
-        instance.role = validated_data.get('role', instance.role)
-        instance.username = validated_data.get('username', instance.username)
-        instance.first_name = validated_data.get('first_name', instance.first_name)
-        instance.last_name = validated_data.get('last_name', instance.last_name)
-        instance.password = validated_data.get('password', instance.password)
-        instance.warehouse = validated_data.get('warehouse', instance.warehouse)
-        instance.address = validated_data.get('address', instance.address)
-        instance.birth_date = validated_data.get('birth_date', instance.birth_date)
-        instance.status = validated_data.get('status', instance.status)
-        instance.is_available = validated_data.get('is_available', instance.is_available)
-
-        instance.save()
-        return instance
-
 
 class SalaryParamsSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only = True)
     class Meta:
         model = SalaryParams
         fields = '__all__'
 
 class SalaryPaymentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    payer = UserSerializer(read_only=True)
     class Meta:
         model = SalaryPayment
         fields = '__all__'
@@ -98,6 +86,19 @@ class CarSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    task_executors = serializers.PrimaryKeyRelatedField(
+    many=True,
+    queryset=CustomUser.objects.all()
+    )
+
+    class Meta:
+        model = Task
+        fields = '__all__'
+
+class TaskGetSerializer(serializers.ModelSerializer):
+    task_executors = UserSerializer(many = True, read_only=True)
+    task_setter = UserSerializer(read_only=True)
+
     class Meta:
         model = Task
         fields = '__all__'

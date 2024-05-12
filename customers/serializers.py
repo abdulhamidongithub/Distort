@@ -1,10 +1,12 @@
 from rest_framework import serializers
 
 from .models import CustomerStore
-from users.serializers import UserSerializer  # Import UserSerializer from your users app
+from users.serializers import UserSerializer
+from warehouses.serializers import WarehouseSerializer
 
 class CustomerStoreSerializer(serializers.ModelSerializer):
-    added_by = UserSerializer(read_only=True)  # Nested serializer for added_by field
+    added_by = UserSerializer(read_only=True)
+    warehouse = WarehouseSerializer(read_only=True)
 
     class Meta:
         model = CustomerStore

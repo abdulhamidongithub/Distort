@@ -1,25 +1,26 @@
 from rest_framework import serializers
 
 from .models import *
+from users.serializers import UserSerializer
 from customers.serializers import CustomerStoreSerializer
+from warehouses.serializers import WarehouseProductGetSerializer, WarehouseSerializer
 
 class OrderSerializer(serializers.ModelSerializer):
-    customer = CustomerStoreSerializer()
+    customer = CustomerStoreSerializer(read_only = True)
+    product = WarehouseProductGetSerializer(read_only = True)
+    warehouse = WarehouseSerializer(read_only = True)
+    operator = UserSerializer(read_only = True)
+    driver = UserSerializer(read_only = True)
+
     class Meta:
         model = Order
         fields = '__all__'
+        extra_kwargs = {
+            'deadline': {'required': False},
+            'comment': {'required': False},
+            'status': {'required': False},
+            'customer': {'required': False},
+            'date_time': {'required': False},
+            'discount': {'required': False},
+        }
 
-    def update(self, instance, validated_data):
-        instance.product = validated_data.get('product', instance.product)
-        instance.customer = validated_data.get('customer', instance.customer)
-        instance.operator = validated_data.get('operator', instance.operator)
-        instance.warehouse = validated_data.get('warehouse', instance.warehouse)
-        instance.driver = validated_data.get('driver', instance.driver)
-        instance.amount = validated_data.get('amount', instance.amount)
-        instance.deadline = validated_data.get('deadline', instance.deadline)
-        instance.date_time = validated_data.get('date_time', instance.date_time)
-        instance.comment = validated_data.get('comment', instance.comment)
-        instance.status = validated_data.get('status', instance.status)
-
-        instance.save()
-        return instance

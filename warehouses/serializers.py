@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import *
+from products.serializers import ProductSerializer
 
 class WarehouseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,6 +16,8 @@ class WarehouseProductSerializer(serializers.Serializer):
     comment = serializers.CharField(required=False)
 
 class WarehouseProductGetSerializer(serializers.ModelSerializer):
+    warehouse = WarehouseSerializer(read_only=True)
+    product = ProductSerializer(read_only=True)
     class Meta:
         model = WarehouseProduct
         fields = ['id', 'product', 'warehouse', 'amount', 'invalids_amount']

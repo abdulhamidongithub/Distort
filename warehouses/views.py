@@ -15,15 +15,16 @@ from products.models import Product
 from customers.serializers import CustomerStoreSerializer
 from users.models import CustomUser, Task
 from orders.models import Order
-from users.serializers import UserSerializer, TaskSerializer
+from users.serializers import UserSerializer, TaskSerializer, TaskGetSerializer
 from orders.serializers import OrderSerializer
 from .serializers import *
 
 
 class WarehouseProductsAPIView(APIView):
     def get(self, request, pk):
-        ware_products = WarehouseProduct.objects.filter(warehouse__id=pk)
-        serializer = WarehouseProductSerializer(ware_products, many=True)
+        warehouse = get_object_or_404(Warehouse.objects.all(), id=pk)
+        ware_products = WarehouseProduct.objects.filter(warehouse = warehouse)
+        serializer = WarehouseProductGetSerializer(ware_products, many=True)
         return Response(serializer.data)
 
 class WarehouseProductCreteOrUpdate(APIView):
@@ -53,7 +54,7 @@ class WarehouseProductCreteOrUpdate(APIView):
 class WarehouseProductDetailAPIView(APIView):
     def get(self, request, ware_pk, pr_pk):
         ware_product = get_object_or_404(WarehouseProduct.objects.all(), id=pr_pk, warehouse__id=ware_pk)
-        serializer = WarehouseProductSerializer(ware_product)
+        serializer = WarehouseProductGetSerializer(ware_product)
         return Response(serializer.data)
 
     def delete(self, request, ware_pk, pr_pk):
@@ -93,7 +94,7 @@ class WarehouseTasksAPIView(APIView):
     def get(self, request, pk):
         warehouse_users = CustomUser.objects.filter(warehouse__id = pk)
         tasks = Task.objects.filter(task_executors__in = warehouse_users)
-        serializer = TaskSerializer(tasks, many=True)
+        serializer = TaskGetSerializer(tasks, many=True)
         return Response(serializer.data)
 
 class WarehousesAPIView(APIView):
@@ -142,7 +143,7 @@ class WarehouseDetailsView(APIView):
             "users": UserSerializer(users, many=True).data,
             "warehouse_products": WarehouseProductGetSerializer(warehouse_products, many=True).data,
             "customers": CustomerStoreSerializer(customers, many=True).data,
-            "tasks": TaskSerializer(tasks, many=True).data
+            "tasks": TaskGetSerializer(tasks, many=True).data
         }
         return Response(context, status.HTTP_200_OK)
 

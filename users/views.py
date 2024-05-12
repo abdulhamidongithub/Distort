@@ -194,7 +194,7 @@ class UserReceivedTasks(APIView):
         task_status = request.query_params.get("status")
         if task_status:
             tasks = tasks.filter(status = task_status)
-        serializer = TaskSerializer(tasks, many=True)
+        serializer = TaskGetSerializer(tasks, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
 class UserAssignedTasks(APIView):
@@ -209,7 +209,7 @@ class UserAssignedTasks(APIView):
         task_status = request.query_params.get("status")
         if task_status:
             tasks = tasks.filter(status = task_status)
-        serializer = TaskSerializer(tasks, many=True)
+        serializer = TaskGetSerializer(tasks, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
 class TasksAllAPIView(APIView):
@@ -244,7 +244,7 @@ class TasksAllAPIView(APIView):
             tasks = tasks.filter(task_executors__role = role)
         if warehouse_id:
             tasks = tasks.filter(task_executors__warehouse__id = warehouse_id)
-        serializer = TaskSerializer(tasks, many=True)
+        serializer = TaskGetSerializer(tasks, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
 class TaskDeleteAPIView(APIView):

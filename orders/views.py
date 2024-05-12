@@ -58,7 +58,7 @@ class OrdersAPIView(APIView):
     def post(self, request):
         order = request.data
         product = WarehouseProduct.objects.get(id=order.get("product"))
-        if product.amount < order.amount:
+        if product.amount < order.get("amount"):
             return Response({"success": "false", "message": f"Miqdor yetarli emas. Mavjud miqdor: {product.amount}"})
         serializer = OrderSerializer(data=order)
         serializer.is_valid(raise_exception=True)
