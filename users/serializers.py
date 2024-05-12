@@ -61,16 +61,27 @@ class UserSerializer(serializers.ModelSerializer):
             data.update({"car": serializer.data})
         return data
 
+class UserCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = [
+            'id', "first_name", "last_name", 'phone_number', "role", "username", "password", "address",
+            "birth_date", "status", "warehouse", "is_available"
+            ]
 
 class SalaryParamsSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only = True)
     class Meta:
         model = SalaryParams
         fields = '__all__'
 
+    def to_representation(self, instance):
+        data = super(SalaryParamsSerializer, self).to_representation(instance)
+        if instance.user:
+            user = UserSerializer(CustomUser.objects.get(id=instance.user.id))
+            data.update({"user": user.data})
+        return data
+
 class SalaryPaymentSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    payer = UserSerializer(read_only=True)
     class Meta:
         model = SalaryPayment
         fields = '__all__'
@@ -78,6 +89,16 @@ class SalaryPaymentSerializer(serializers.ModelSerializer):
             'paid_at': {'required': False},
             'payer': {'required': False}
         }
+
+    def to_representation(self, instance):
+        data = super(SalaryParamsSerializer, self).to_representation(instance)
+        if instance.user:
+            user = UserSerializer(CustomUser.objects.get(id=instance.user.id))
+            data.update({"user": user.data})
+        if instance.payer:
+            user = UserSerializer(CustomUser.objects.get(id=instance.payer.id))
+            data.update({"payer": user.data})
+        return data
 
 class CarSerializer(serializers.ModelSerializer):
     class Meta:

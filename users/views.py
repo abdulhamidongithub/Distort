@@ -38,7 +38,7 @@ class UsersAPIView(APIView):
     @swagger_auto_schema(request_body=UserSerializer)
     def post(self, request):
         user = request.data
-        serializer = UserSerializer(data=user)
+        serializer = UserCreateSerializer(data=user)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         SalaryParams.objects.create(
@@ -67,7 +67,7 @@ class UserAPIView(APIView):
                     "success": "false", "message": "Active orderlar mavjud",
                     "orders": OrderSerializer(orders, many=True).data
                 }, status.HTTP_400_BAD_REQUEST)
-        serializer = UserSerializer(instance=saved_user, data=data, partial=True)
+        serializer = UserCreateSerializer(instance=saved_user, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
@@ -103,7 +103,7 @@ class UserAPIView2(APIView):
                         "success": "false", "message": "Active orderlar mavjud",
                         "orders": OrderSerializer(orders, many=True).data
                     }, status.HTTP_400_BAD_REQUEST)
-            serializer = UserSerializer(instance=saved_user, data=data, partial=True)
+            serializer = UserCreateSerializer(instance=saved_user, data=data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)

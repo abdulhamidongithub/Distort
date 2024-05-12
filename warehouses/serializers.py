@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from .models import *
 from products.serializers import ProductSerializer
+from products.models import Product
 
 class WarehouseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,8 +17,14 @@ class WarehouseProductSerializer(serializers.Serializer):
     comment = serializers.CharField(required=False)
 
 class WarehouseProductGetSerializer(serializers.ModelSerializer):
-    warehouse = WarehouseSerializer(read_only=True)
-    product = ProductSerializer(read_only=True)
     class Meta:
         model = WarehouseProduct
         fields = ['id', 'product', 'warehouse', 'amount', 'invalids_amount']
+
+    def to_representation(self, instance):
+        data = super(WarehouseProductGetSerializer, self).to_representation(instance)
+        warehouse = WarehouseSerializer(Warehouse.objects.get(id=instance.warehouse.id))
+        data.update({"warehouse": warehouse.data})
+        product = ProductSerializer(Product.objects.get(id=instance.product.id))
+        data.update({"product": product.data})
+        return data

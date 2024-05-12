@@ -42,6 +42,7 @@ class WarehouseProductCreteOrUpdate(APIView):
         )
         if not created:
             warehouse_product.amount += validated_data['amount']
+            warehouse_product.invalids_amount += validated_data.get(('invalids_amount'), 0)
             warehouse_product.save()
         WarehouseProductArrival.objects.create(
             warehouse_product=warehouse_product,
