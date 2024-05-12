@@ -23,8 +23,10 @@ class WarehouseProductGetSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super(WarehouseProductGetSerializer, self).to_representation(instance)
-        warehouse = WarehouseSerializer(Warehouse.objects.get(id=instance.warehouse.id))
-        data.update({"warehouse": warehouse.data})
-        product = ProductSerializer(Product.objects.get(id=instance.product.id))
-        data.update({"product": product.data})
+        if instance.warehouse:
+            warehouse = WarehouseSerializer(Warehouse.objects.get(id=instance.warehouse.id))
+            data.update({"warehouse": warehouse.data})
+        if instance.product:
+            product = ProductSerializer(Product.objects.get(id=instance.product.id))
+            data.update({"product": product.data})
         return data
