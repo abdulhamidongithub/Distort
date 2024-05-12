@@ -39,7 +39,8 @@ class CustomUser(AbstractUser):
         Warehouse,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name="customuser_set"
     )
     balance = models.IntegerField(default=0)
     is_available = models.BooleanField(default=False)
