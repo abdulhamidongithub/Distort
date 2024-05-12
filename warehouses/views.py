@@ -152,4 +152,36 @@ class WarehouseDetailsView(APIView):
         warehouse.delete()
         return Response({"message": "deleted", "message": "Warehouse deleted"})
 
+class WarehouseOrdersAPIView(APIView):
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('date', openapi.IN_QUERY, description="Filter by date", type=openapi.TYPE_STRING),
+        openapi.Parameter('status', openapi.IN_QUERY, description="Filter by status", type=openapi.TYPE_STRING),
+        openapi.Parameter('customer', openapi.IN_QUERY, description="Filter by customer ID, name, address, or phone",
+                          type=openapi.TYPE_STRING),
+        openapi.Parameter('product', openapi.IN_QUERY, description="Filter by product ID or name",
+                          type=openapi.TYPE_STRING),
+    ])
+    def get(self, request, pk):
+        orders = Order.objects.filter(warehouse__id = pk)
+        date = request.query_params.get("date")
+        order_status = request.query_params.get("status")
+        customer = request.query_params.get("customer")
+        product = request.query_params.get("product")
+        if order_status:
+            order_status = order_status.split("-")
+            orders = orders.filter(status=order_status[0])
+            for status in order_status[1:]:
+                orders = orders | Order.objects.filter(status=status, warehouse__id = pk)
+        if customer:
+            orders = orders.filter(customer__id=customer
+                    ) | orders.filter(customer__name__icontains=customer
+                    ) | orders.filter(customer__address__icontains=customer
+                    ) | orders.filter(customer__phone__icontains=customer)
+        if product:
+            orders = orders.filter(product__id=product
+                                   ) | orders.filter(product__name__icontains=product)
+        if date:
+            orders = orders.filter(date_time__startswith=date)
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
 
