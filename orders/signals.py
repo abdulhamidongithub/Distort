@@ -9,7 +9,7 @@ from users.models import SalaryParams
 @receiver(post_save, sender=Order)
 def decrement_amount_on_order_create(sender, instance, created, **kwargs):
     if created:
-        warehouse_product = instance.product
+        warehouse_product = instance.warehouse_product
         warehouse_product.amount -= instance.amount
         warehouse_product.save()
 
@@ -48,7 +48,7 @@ def return_amount_on_order_cancel(sender, instance, **kwargs):
         try:
             original_order = Order.objects.get(pk=instance.pk)
             if original_order.status != "Cancelled":
-                warehouse_product = instance.product
+                warehouse_product = instance.warehouse_product
                 warehouse_product.amount += instance.amount
                 warehouse_product.save()
         except Order.DoesNotExist:

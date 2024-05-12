@@ -91,7 +91,7 @@ class SalaryPaymentSerializer(serializers.ModelSerializer):
         }
 
     def to_representation(self, instance):
-        data = super(SalaryParamsSerializer, self).to_representation(instance)
+        data = super(SalaryPaymentSerializer, self).to_representation(instance)
         if instance.user:
             user = UserSerializer(CustomUser.objects.get(id=instance.user.id))
             data.update({"user": user.data})

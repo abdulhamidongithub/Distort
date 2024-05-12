@@ -16,7 +16,7 @@ STATUSES = [
 ]
 
 class Order(models.Model):
-    product = models.ForeignKey(WarehouseProduct, on_delete=models.SET_NULL, null=True)
+    warehouse_product = models.ForeignKey(WarehouseProduct, on_delete=models.SET_NULL, null=True)
     customer = models.ForeignKey(CustomerStore, on_delete=models.SET_NULL, null=True)
     operator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="operator_orders")
     warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True)

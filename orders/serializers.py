@@ -26,8 +26,8 @@ class OrderSerializer(serializers.ModelSerializer):
         if instance.warehouse:
             warehouse = WarehouseSerializer(Warehouse.objects.get(id=instance.warehouse.id))
             data.update({"warehouse": warehouse.data})
-        if instance.product:
-            ware_product = WarehouseProductGetSerializer(WarehouseProduct.objects.get(id=instance.product.id))
+        if instance.warehouse_product:
+            ware_product = WarehouseProductGetSerializer(WarehouseProduct.objects.get(id=instance.warehouse_product.id))
             data.update({"product": ware_product.data})
         if instance.operator:
             user = UserSerializer(CustomUser.objects.get(id=instance.operator.id))

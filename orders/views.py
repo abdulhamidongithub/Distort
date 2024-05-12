@@ -36,8 +36,8 @@ class OrdersAPIView(APIView):
                 ) | orders.filter( customer__address__icontains = customer
                 ) | orders.filter(customer__phone__icontains = customer)
         if product:
-            orders = orders.filter( product__id = product
-                ) | orders.filter( product__name__icontains = product)
+            orders = orders.filter( warehouse_product__product__id = product
+                ) | orders.filter( warehouse_product__product__name__icontains = product)
         if date:
             orders = orders.filter(date_time__startswith=date)
         counts = {
@@ -57,7 +57,7 @@ class OrdersAPIView(APIView):
     @swagger_auto_schema(request_body=OrderSerializer)
     def post(self, request):
         order = request.data
-        product = WarehouseProduct.objects.get(id=order.get("product"))
+        product = WarehouseProduct.objects.get(id=order.get("warehouse_product"))
         if product.amount < order.get("amount"):
             return Response({"success": "false", "message": f"Miqdor yetarli emas. Mavjud miqdor: {product.amount}"})
         serializer = OrderSerializer(data=order)
