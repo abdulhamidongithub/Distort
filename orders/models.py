@@ -38,8 +38,8 @@ class Order(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.total_price:  # If total_price is not provided explicitly
-            if self.product:  # Ensure product is set
-                product_price = self.product.product.price
+            if self.warehouse_product:  # Ensure product is set
+                product_price = self.warehouse_product.product.price
                 self.total_price = (self.amount * product_price) - self.discount
         super().save(*args, **kwargs)
 
