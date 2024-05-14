@@ -253,6 +253,14 @@ class TaskDeleteAPIView(APIView):
         task.delete()
         return Response({"message": "deleted", "message": "Task deleted"})
 
+    @swagger_auto_schema(request_body=TaskSerializer)
+    def put(self, request, pk):
+        task = get_object_or_404(Task.objects.all(), id=pk)
+        serializer = TaskSerializer(task, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
 class UserSalaryParamsView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]

@@ -31,6 +31,7 @@ urlpatterns = [
     path('categories/', CategoriesAPIView.as_view()),
     path('tasks/all/', TasksAllAPIView.as_view()),
     path('tasks/<int:pk>/delete/', TaskDeleteAPIView.as_view()),
+    path('tasks/<int:pk>/update/', TaskDeleteAPIView.as_view()),
     path('category/<int:pk>/', CategoryDetailAPIView.as_view()),
     path('category/<int:pk>/products/', CategoryProductsAPIView.as_view()),
 

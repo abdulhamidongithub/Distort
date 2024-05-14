@@ -148,6 +148,14 @@ class WarehouseDetailsView(APIView):
         }
         return Response(context, status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=WarehouseSerializer)
+    def put(self, request, pk):
+        warehouse = get_object_or_404(Warehouse.objects.all(), id=pk)
+        serializer = WarehouseSerializer(warehouse, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
     def delete(self, request, pk):
         warehouse = get_object_or_404(Warehouse.objects.all(), id=pk)
         warehouse.delete()
