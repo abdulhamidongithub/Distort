@@ -326,3 +326,46 @@ class CalculateUserSalary(APIView):
         if not month:
             return None
         return f"{year}-{month}"
+
+class DriverLocationPostView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(request_body=DriverLocationSerializer)
+    def post(self, request):
+        """
+        Driver location create
+        """
+        serializer = DriverLocationSerializer(data=request.data)
+        if serializer.is_valid():
+            driver = CustomUser.objects.filter(id=request.user.id).first()
+            location = DriverLocation.objects.filter(driver__id=driver.id).first()
+            if location:
+                location.longitude = serializer.validated_data['longitude']
+                location.latitude = serializer.validated_data['latitude']
+                location.bearing = serializer.validated_data['bearing']
+                location.date = datetime.now()
+
+                location.save()
+
+                # channel_layer = get_channel_layer()
+                # async_to_sync(channel_layer.group_send)(
+                #     "driver_location_group",
+                #     {
+                #         "type": "add_new_driver_location",
+                #     },
+                # )
+
+                return Response(serializer.data, status=201)
+            serializer.save(driver=driver, date=datetime.now())
+
+            # channel_layer = get_channel_layer()
+            # async_to_sync(channel_layer.group_send)(
+            #     "driver_location_group",
+            #     {
+            #         "type": "add_new_driver_location",
+            #     },
+            # )
+
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=401)

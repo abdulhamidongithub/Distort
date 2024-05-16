@@ -6,6 +6,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from .models import *
+from warehouses.models import WarehouseProduct
 from .serializers import *
 
 class ProductsAPIView(APIView):
@@ -63,6 +64,11 @@ class ProductDetailAPIView(APIView):
 
     def delete(self, request, pk):
         product = get_object_or_404(Product.objects.all(), id=pk)
+        warehouse_products = WarehouseProduct.objects.filter(product = product)
+        if warehouse_products.exists():
+            return Response({"success": "false",
+                            "message": "Bu mahsulot filiallarda mavjud. Avval filiallardan o'chirish kerak!"},
+                            status.HTTP_406_NOT_ACCEPTABLE)
         product.delete()
         return Response({"success": "true", "message": "Product deleted"}, status.HTTP_200_OK)
 

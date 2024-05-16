@@ -83,3 +83,13 @@ class Task(models.Model):
     status = models.CharField(max_length=30)
     def __str__(self):
         return self.text
+
+class DriverLocation(models.Model):
+    driver = models.ForeignKey(CustomUser, related_name='driver_location', on_delete=models.CASCADE)
+    longitude = models.CharField(max_length=255, blank=True, null=True)
+    latitude = models.CharField(max_length=255, blank=True, null=True)
+    bearing = models.CharField(max_length=255, blank=True, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.driver.first_name

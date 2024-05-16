@@ -59,7 +59,11 @@ class OrdersAPIView(APIView):
         order = request.data
         product = WarehouseProduct.objects.get(id=order.get("warehouse_product"))
         if product.amount < order.get("amount"):
-            return Response({"success": "false", "message": f"Miqdor yetarli emas. Mavjud miqdor: {product.amount}"})
+            return Response(
+                {"success": "false",
+                 "message": f"Miqdor yetarli emas. Mavjud miqdor: {product.amount}"},
+                      status.HTTP_406_NOT_ACCEPTABLE
+            )
         serializer = OrderSerializer(data=order)
         serializer.is_valid(raise_exception=True)
         serializer.save()

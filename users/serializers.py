@@ -152,3 +152,19 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['old_password', 'new_password','re_new_password']
+
+class DriverLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DriverLocation
+        fields = '__all__'
+        extra_kwargs = {
+            'driver': {'read_only': True},
+        }
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        driver = data.get('driver')
+        driver = CustomUser.objects.filter(id=driver).first()
+        driver_ser = UserSerializer(driver)
+        data['driver'] = driver_ser.data
+        return data
