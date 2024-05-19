@@ -10,6 +10,8 @@ from rest_framework.permissions import IsAuthenticated
 from drf_yasg import openapi
 from datetime import datetime
 from django.db.models import Sum
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 from .models import *
 from orders.models import Order, KPIEarning
@@ -348,24 +350,24 @@ class DriverLocationPostView(APIView):
 
                 location.save()
 
-                # channel_layer = get_channel_layer()
-                # async_to_sync(channel_layer.group_send)(
-                #     "driver_location_group",
-                #     {
-                #         "type": "add_new_driver_location",
-                #     },
-                # )
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    "driver_location_group",
+                    {
+                        "type": "add_new_driver_location",
+                    },
+                )
 
                 return Response(serializer.data, status=201)
             serializer.save(driver=driver, date=datetime.now())
 
-            # channel_layer = get_channel_layer()
-            # async_to_sync(channel_layer.group_send)(
-            #     "driver_location_group",
-            #     {
-            #         "type": "add_new_driver_location",
-            #     },
-            # )
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "driver_location_group",
+                {
+                    "type": "add_new_driver_location",
+                },
+            )
 
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=401)

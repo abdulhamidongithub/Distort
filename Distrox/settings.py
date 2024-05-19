@@ -104,13 +104,14 @@ else:
             'PORT': '3306',
         }
     }
-# ASGI_APPLICATION = "Distrox.asgi.application"
-#
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": 'channels.layers.InMemoryChannelLayer'
-#     }
-# }
+
+ASGI_APPLICATION = "Distrox.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": 'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 
 # Password validation

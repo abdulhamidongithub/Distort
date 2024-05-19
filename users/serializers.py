@@ -168,3 +168,5 @@ class DriverLocationSerializer(serializers.ModelSerializer):
         driver_ser = UserSerializer(driver)
         data['driver'] = driver_ser.data
         return data
+
+
