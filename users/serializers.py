@@ -50,7 +50,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = [
             'id', "first_name", "last_name", 'phone_number', "role", "username", "password", "address",
-            "birth_date", "status", "warehouse", "is_available"
+            "birth_date", "status", "warehouse", "is_available", "photo"
             ]
 
     def to_representation(self, instance):
@@ -66,7 +66,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = [
             'id', "first_name", "last_name", 'phone_number', "role", "username", "password", "address",
-            "birth_date", "status", "warehouse", "is_available"
+            "birth_date", "status", "warehouse", "is_available", "photo"
             ]
 
 class SalaryParamsSerializer(serializers.ModelSerializer):
