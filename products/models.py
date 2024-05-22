@@ -9,6 +9,9 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ["name", "-id"]
+
 class Product(models.Model):
     id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, primary_key=True)
     name = models.CharField(max_length=100)
@@ -32,6 +35,9 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ["name", "-id"]
 
 class Discount(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

@@ -18,3 +18,5 @@ class CustomerStore(models.Model):
     def __str__(self):
         return f"{self.name}, {self.address}"
 
+    class Meta:
+        ordering = ["name", "address"]

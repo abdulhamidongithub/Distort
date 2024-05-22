@@ -14,6 +14,9 @@ class Warehouse(models.Model):
     def __str__(self):
         return f"{self.name}, {self.address}"
 
+    class Meta:
+        ordering = ["name", "id"]
+
 class WarehouseProduct(models.Model):
     id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, primary_key=True)
     warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True)

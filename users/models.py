@@ -48,6 +48,9 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.role})"
 
+    class Meta:
+        ordering = ["first_name", "last_name"]
+
 class SalaryParams(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.SET_NULL, null=True)
     fixed = models.PositiveIntegerField()
