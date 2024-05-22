@@ -27,7 +27,7 @@ class WarehouseProductsAPIView(APIView):
         serializer = WarehouseProductGetSerializer(ware_products, many=True)
         return Response(serializer.data)
 
-class WarehouseProductCreteOrUpdate(APIView):
+class WarehouseProductCreate(APIView):
     @swagger_auto_schema(request_body=WarehouseProductSerializer)
     def post(self, request):
         serializer = WarehouseProductSerializer(data=request.data)
@@ -35,20 +35,17 @@ class WarehouseProductCreteOrUpdate(APIView):
         validated_data = serializer.validated_data
         warehouse = get_object_or_404(Warehouse.objects.all(), id=validated_data['warehouse'])
         product = get_object_or_404(Product.objects.all(), id=validated_data['product'])
-        warehouse_product, created = WarehouseProduct.objects.get_or_create(
+        warehouse_product = WarehouseProduct.objects.create(
             warehouse=warehouse,
             product=product,
-            defaults={'amount': validated_data['amount']}
+            amount = validated_data.get('amount'),
+            invalids_amount = validated_data.get(('invalids_amount'), 0)
         )
-        if not created:
-            warehouse_product.amount += validated_data['amount']
-            warehouse_product.invalids_amount += validated_data.get(('invalids_amount'), 0)
-            warehouse_product.save()
-        WarehouseProductArrival.objects.create(
-            warehouse_product=warehouse_product,
-            amount=validated_data['amount'],
-            comment=validated_data.get("comment", None)
-        )
+        # WarehouseProductArrival.objects.create(
+        #     warehouse_product=warehouse_product,
+        #     amount=validated_data['amount'],
+        #     comment=validated_data.get("comment", None)
+        # )
         serializer = WarehouseProductSerializer(warehouse_product)
         return Response({"warehouse_product": serializer.data})
 
@@ -62,6 +59,14 @@ class WarehouseProductDetailAPIView(APIView):
         warehouse_product = get_object_or_404(WarehouseProduct.objects.all(), id=pr_pk, warehouse__id=ware_pk)
         warehouse_product.delete()
         return Response({"success" :"true", "message": "deleted"})
+
+    @swagger_auto_schema(request_body=WarehouseProductSerializer)
+    def put(self, request, ware_pk, pr_pk):
+        warehouse_product = get_object_or_404(WarehouseProduct.objects.all(), id=pr_pk)
+        serializer = WarehouseProductSerializer(instance=request.data, data=warehouse_product)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 class WarehouseCustomersAPIView(APIView):
     def get(self, request, pk):
