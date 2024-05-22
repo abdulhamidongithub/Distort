@@ -72,7 +72,7 @@ class SalaryPayment(models.Model):
 class Car(models.Model):
     type = models.CharField(max_length=50)
     number = models.CharField(max_length=10)
-    driver = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    driver = models.OneToOneField(CustomUser, on_delete=models.SET_NULL, null=True)
 
 class Task(models.Model):
     text = models.TextField()

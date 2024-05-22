@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import APIException
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
@@ -104,6 +105,12 @@ class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
         fields = '__all__'
+
+    def validate_driver(self, driver):
+        car = Car.objects.filter(driver__id = driver)
+        if car.exists():
+            raise APIException("Haydovchida allaqachon biriktirilgan mashina bor")
+        return driver
 
 
 class TaskSerializer(serializers.ModelSerializer):
