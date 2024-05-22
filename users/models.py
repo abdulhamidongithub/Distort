@@ -87,6 +87,9 @@ class Task(models.Model):
     def __str__(self):
         return self.text
 
+    class Meta:
+        ordering = ["-deadline", "-id"]
+
 class DriverLocation(models.Model):
     driver = models.ForeignKey(CustomUser, related_name='driver_location', on_delete=models.CASCADE)
     longitude = models.CharField(max_length=255, blank=True, null=True)
