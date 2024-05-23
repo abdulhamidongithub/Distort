@@ -12,6 +12,7 @@ from datetime import datetime
 from django.db.models import Sum
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from rest_framework.pagination import PageNumberPagination
 
 from .models import *
 from orders.models import Order, KPIEarning
@@ -26,6 +27,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
 class UsersAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(manual_parameters=[
         openapi.Parameter('role', openapi.IN_QUERY, description="Search by role", type=openapi.TYPE_STRING)
     ])
@@ -33,9 +35,13 @@ class UsersAPIView(APIView):
         users = CustomUser.objects.all()
         role = request.query_params.get("role")
         if role:
-            users = users.filter(role = role.lower())
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
+            users = users.filter(role=role.lower())
+
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(users, request)
+        serializer = UserSerializer(result_page, many=True)
+
+        return paginator.get_paginated_response(serializer.data)
 
     @swagger_auto_schema(request_body=UserSerializer)
     def post(self, request):
@@ -44,11 +50,12 @@ class UsersAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         SalaryParams.objects.create(
-            user = user,
-            fixed = 0,
-            kpi_by_sales = 0
+            user=user,
+            fixed=0,
+            kpi_by_sales=0
         )
         return Response(serializer.data, status.HTTP_201_CREATED)
+
 
 class UserAPIView(APIView):
     authentication_classes = [JWTAuthentication]
