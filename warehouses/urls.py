@@ -11,5 +11,5 @@ urlpatterns = [
     path('<str:pk>/tasks/', WarehouseTasksAPIView.as_view()),
     path('all/', WarehousesAPIView.as_view()),
     path('details/<str:pk>/', WarehouseDetailsView.as_view()),
-    path('warehouse_product/create/', WarehouseProductCreteOrUpdate.as_view()),
+    path('warehouse_product/create/', WarehouseProductCreate.as_view()),
 ]
