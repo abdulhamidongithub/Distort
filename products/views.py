@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from rest_framework.pagination import PageNumberPagination
 
 from .models import *
 from warehouses.models import WarehouseProduct
@@ -19,8 +20,10 @@ class ProductsAPIView(APIView):
         if search_word:
             products = products.filter(name__icontains=search_word
                         ) | products.filter(about__icontains=search_word)
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(products, request)
+        serializer = ProductSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     @swagger_auto_schema(request_body=ProductSerializer)
     def post(self, request):
@@ -32,8 +35,10 @@ class ProductsAPIView(APIView):
 class CategoriesAPIView(APIView):
     def get(self, request):
         categories = (Category.objects.all())
-        serializer = CategorySerializer(categories, many=True)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(categories, request)
+        serializer = CategorySerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     @swagger_auto_schema(request_body=CategorySerializer)
     def post(self, request):

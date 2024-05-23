@@ -36,11 +36,9 @@ class UsersAPIView(APIView):
         role = request.query_params.get("role")
         if role:
             users = users.filter(role=role.lower())
-
         paginator = PageNumberPagination()
         result_page = paginator.paginate_queryset(users, request)
         serializer = UserSerializer(result_page, many=True)
-
         return paginator.get_paginated_response(serializer.data)
 
     @swagger_auto_schema(request_body=UserSerializer)
@@ -126,8 +124,10 @@ class UserSalaryPaymentsAPIView(APIView):
     def get(self, request):
         user = request.user
         salary_payments = SalaryPayment.objects.filter(user=user)
-        serializer = SalaryPaymentSerializer(salary_payments, many=True)
-        return Response(serializer.data, status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(salary_payments, request)
+        serializer = SalaryPaymentSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     @swagger_auto_schema(request_body=SalaryPaymentSerializer)
     def post(self, request):
@@ -203,8 +203,10 @@ class UserReceivedTasks(APIView):
         task_status = request.query_params.get("status")
         if task_status:
             tasks = tasks.filter(status = task_status)
-        serializer = TaskGetSerializer(tasks, many=True)
-        return Response(serializer.data, status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(tasks, request)
+        serializer = TaskGetSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class UserAssignedTasks(APIView):
     authentication_classes = [JWTAuthentication]
@@ -218,8 +220,10 @@ class UserAssignedTasks(APIView):
         task_status = request.query_params.get("status")
         if task_status:
             tasks = tasks.filter(status = task_status)
-        serializer = TaskGetSerializer(tasks, many=True)
-        return Response(serializer.data, status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(tasks, request)
+        serializer = TaskGetSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class TasksAllAPIView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -253,8 +257,10 @@ class TasksAllAPIView(APIView):
             tasks = tasks.filter(task_executors__role = role)
         if warehouse_id:
             tasks = tasks.filter(task_executors__warehouse__id = warehouse_id)
-        serializer = TaskGetSerializer(tasks, many=True)
-        return Response(serializer.data, status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(tasks, request)
+        serializer = TaskGetSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class TaskDeleteAPIView(APIView):
     def delete(self, request, pk):

@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 
 from .models import *
 from customers.models import CustomerStore
@@ -24,8 +25,10 @@ class WarehouseProductsAPIView(APIView):
     def get(self, request, pk):
         warehouse = get_object_or_404(Warehouse.objects.all(), id=pk)
         ware_products = WarehouseProduct.objects.filter(warehouse = warehouse)
-        serializer = WarehouseProductGetSerializer(ware_products, many=True)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(ware_products, request)
+        serializer = WarehouseProductGetSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class WarehouseProductCreate(APIView):
     @swagger_auto_schema(request_body=WarehouseProductSerializer)
@@ -71,8 +74,10 @@ class WarehouseProductDetailAPIView(APIView):
 class WarehouseCustomersAPIView(APIView):
     def get(self, request, pk):
         warehouse_clients = CustomerStore.objects.filter(warehouse__id=pk)
-        serializer = CustomerStoreSerializer(warehouse_clients, many=True)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(warehouse_clients, request)
+        serializer = CustomerStoreSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     @swagger_auto_schema(request_body=CustomerStoreSerializer)
     def post(self, request, pk):
@@ -93,21 +98,27 @@ class WarehouseEmployeesAPIView(APIView):
         role = request.query_params.get("role")
         if role:
             employees = employees.filter(role = role.lower())
-        serializer = UserSerializer(employees, many=True)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(employees, request)
+        serializer = UserSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class WarehouseTasksAPIView(APIView):
     def get(self, request, pk):
         warehouse_users = CustomUser.objects.filter(warehouse__id = pk)
         tasks = Task.objects.filter(task_executors__in = warehouse_users)
-        serializer = TaskGetSerializer(tasks, many=True)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(tasks, request)
+        serializer = TaskGetSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class WarehousesAPIView(APIView):
     def get(self, request):
         warehouses = Warehouse.objects.all()
-        serializer = WarehouseSerializer(warehouses, many=True)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(warehouses, request)
+        serializer = WarehouseSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     @swagger_auto_schema(request_body=WarehouseSerializer)
     def post(self, request):
@@ -196,6 +207,7 @@ class WarehouseOrdersAPIView(APIView):
                                    ) | orders.filter(product__name__icontains=product)
         if date:
             orders = orders.filter(date_time__startswith=date)
-        serializer = OrderSerializer(orders, many=True)
-        return Response(serializer.data)
-
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(orders, request)
+        serializer = OrderSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)

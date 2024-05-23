@@ -72,6 +72,9 @@ class SalaryPayment(models.Model):
     month = models.CharField(max_length=10, blank=True, null=True)
     year = models.PositiveSmallIntegerField(default=2024)
 
+    class Meta:
+        ordering = ["-year", "-month", "-paid_at"]
+
 class Car(models.Model):
     type = models.CharField(max_length=50)
     number = models.CharField(max_length=10)

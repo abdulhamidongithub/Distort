@@ -6,6 +6,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 
 from .models import CustomerStore
 from .serializers import *
@@ -23,8 +24,10 @@ class CustomersAPIView(APIView):
             customers = customers.filter(name__icontains=search
                         ) | customers.filter(address__icontains = search
                         ) | customers.filter(phone__icontains = search)
-        serializer = CustomerStoreSerializer(customers, many=True)
-        return Response(serializer.data, status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(customers, request)
+        serializer = CustomerStoreSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     @swagger_auto_schema(request_body=CustomerStoreSerializer)
     def post(self, request):
