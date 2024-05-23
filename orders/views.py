@@ -10,6 +10,7 @@ from .models import *
 from .serializers import *
 from warehouses.models import WarehouseProduct
 from users.models import CustomUser
+from customers.models import CustomerStore
 
 class OrdersAPIView(APIView):
     @swagger_auto_schema(manual_parameters=[
@@ -135,3 +136,41 @@ class DriverOrdersAPIView(APIView):
             "counts": counts,
             "orders": serializer.data,
         })
+
+class OperatorOrdersAPIView(APIView):
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('date', openapi.IN_QUERY, description="Filter by date", type=openapi.TYPE_STRING),
+        openapi.Parameter('status', openapi.IN_QUERY, description="Filter by status", type=openapi.TYPE_STRING)
+    ])
+    def get(self, request, operator_id):
+        operator = get_object_or_404(CustomUser.objects.all(), id=operator_id)
+        orders = Order.objects.filter(operator=operator)
+        date = request.query_params.get("date")
+        order_status = request.query_params.get("status")
+        if order_status:
+            orders = orders.filter(status=order_status)
+        if date:
+            orders = orders.filter(date_time__startswith=date)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(orders, request)
+        serializer = OrderSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+class CustomerOrdersAPIView(APIView):
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('date', openapi.IN_QUERY, description="Filter by date", type=openapi.TYPE_STRING),
+        openapi.Parameter('status', openapi.IN_QUERY, description="Filter by status", type=openapi.TYPE_STRING)
+    ])
+    def get(self, request, customer_id):
+        customer = get_object_or_404(CustomerStore.objects.all(), id=customer_id)
+        orders = Order.objects.filter(customer=customer)
+        date = request.query_params.get("date")
+        order_status = request.query_params.get("status")
+        if order_status:
+            orders = orders.filter(status=order_status)
+        if date:
+            orders = orders.filter(date_time__startswith=date)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(orders, request)
+        serializer = OrderSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
