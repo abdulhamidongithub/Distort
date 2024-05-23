@@ -14,6 +14,7 @@ class CustomerStore(models.Model):
     created_at = models.DateField(auto_now_add=True)
     warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True)
     added_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    archived = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name}, {self.address}"

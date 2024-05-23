@@ -43,6 +43,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             "warehouse": warehouse,
             "status": user.status,
             "is_available": user.is_available,
+            "archived": user.archived
         }
 
 class UserSerializer(serializers.ModelSerializer):
@@ -51,7 +52,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = [
             'id', "first_name", "last_name", 'phone_number', "role", "username", "password", "address",
-            "birth_date", "status", "warehouse", "is_available", "photo"
+            "birth_date", "status", "warehouse", "is_available", "photo", "archived"
             ]
 
     def to_representation(self, instance):

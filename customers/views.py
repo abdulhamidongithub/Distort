@@ -18,7 +18,7 @@ class CustomersAPIView(APIView):
         openapi.Parameter('search', openapi.IN_QUERY, description="You can search by name, address, phone", type=openapi.TYPE_STRING)
     ])
     def get(self, request):
-        customers = CustomerStore.objects.all()
+        customers = CustomerStore.objects.filter(archived = False)
         search = request.query_params.get("search")
         if search:
             customers = customers.filter(name__icontains=search
@@ -40,14 +40,18 @@ class CustomerDetailView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self, request, pk):
-        customer = get_object_or_404(CustomerStore.objects.all(), id=pk)
+        customer = get_object_or_404(CustomerStore.objects.filter(archived = False), id=pk)
         serializer = CustomerStoreSerializer(customer)
         return Response(serializer.data)
 
     def delete(self, request, pk):
         customer = get_object_or_404(CustomerStore.objects.all(), id=pk)
-        customer.delete()
-        return Response({"message": "deleted", "message": "Customer deleted"})
+        if request.user.role == 'admin' and customer.archived == True:
+            customer.delete()
+            return Response({"success": "true", "message": "Customer deleted"})
+        customer.archived = True
+        customer.save()
+        return Response({"success": "true", "message": "Customer arxivlandi"})
 
     @swagger_auto_schema(request_body=CustomerStoreSerializer)
     def put(self, request, pk):
@@ -56,5 +60,15 @@ class CustomerDetailView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+class ArchivedCustomersView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        customers = CustomerStore.objects.filter(archived = True)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(customers, request)
+        serializer = CustomerStoreSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 

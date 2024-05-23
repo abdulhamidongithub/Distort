@@ -5,6 +5,7 @@ class Category(models.Model):
     name = models.CharField(max_length=50)
     status = models.CharField(max_length=30, blank=True, null=True, default="active")
     created_at = models.DateTimeField(auto_now_add=True)
+    archived = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -32,6 +33,7 @@ class Product(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
+    archived = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

@@ -10,6 +10,7 @@ class Warehouse(models.Model):
     location = models.JSONField(null=True, blank=True)
     created_at = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=15, default="active")
+    archived = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name}, {self.address}"
@@ -23,6 +24,7 @@ class WarehouseProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     amount = models.IntegerField()
     invalids_amount = models.IntegerField(default=0)
+    archived = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('warehouse', 'product')

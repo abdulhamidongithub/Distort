@@ -22,15 +22,19 @@ from .serializers import *
 
 
 class WarehouseProductsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk):
         warehouse = get_object_or_404(Warehouse.objects.all(), id=pk)
-        ware_products = WarehouseProduct.objects.filter(warehouse = warehouse)
+        ware_products = WarehouseProduct.objects.filter(warehouse = warehouse, archived = False)
         paginator = PageNumberPagination()
         result_page = paginator.paginate_queryset(ware_products, request)
         serializer = WarehouseProductGetSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
 class WarehouseProductCreate(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(request_body=WarehouseProductSerializer)
     def post(self, request):
         serializer = WarehouseProductSerializer(data=request.data)
@@ -53,6 +57,8 @@ class WarehouseProductCreate(APIView):
         return Response({"warehouse_product": serializer.data})
 
 class WarehouseProductDetailAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request, ware_pk, pr_pk):
         ware_product = get_object_or_404(WarehouseProduct.objects.all(), id=pr_pk, warehouse__id=ware_pk)
         serializer = WarehouseProductGetSerializer(ware_product)
@@ -60,8 +66,12 @@ class WarehouseProductDetailAPIView(APIView):
 
     def delete(self, request, ware_pk, pr_pk):
         warehouse_product = get_object_or_404(WarehouseProduct.objects.all(), id=pr_pk, warehouse__id=ware_pk)
-        warehouse_product.delete()
-        return Response({"success" :"true", "message": "deleted"})
+        if request.user.role == 'admin' and warehouse_product.archived:
+            warehouse_product.delete()
+            return Response({"success" :"true", "message": "deleted"})
+        warehouse_product.archived = True
+        warehouse_product.save()
+        return Response({"success": "true", "message": "arxivlandi"})
 
     @swagger_auto_schema(request_body=WarehouseProductSerializer)
     def put(self, request, ware_pk, pr_pk):
@@ -72,6 +82,8 @@ class WarehouseProductDetailAPIView(APIView):
         return Response(serializer.data)
 
 class WarehouseCustomersAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk):
         warehouse_clients = CustomerStore.objects.filter(warehouse__id=pk)
         paginator = PageNumberPagination()
@@ -88,6 +100,8 @@ class WarehouseCustomersAPIView(APIView):
         return Response(serializer.data, status.HTTP_200_OK)
 
 class WarehouseEmployeesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(manual_parameters=[
         openapi.Parameter('role', openapi.IN_QUERY, description="Search by role", type=openapi.TYPE_STRING)
     ])
@@ -104,6 +118,8 @@ class WarehouseEmployeesAPIView(APIView):
         return paginator.get_paginated_response(serializer.data)
 
 class WarehouseTasksAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk):
         warehouse_users = CustomUser.objects.filter(warehouse__id = pk)
         tasks = Task.objects.filter(task_executors__in = warehouse_users)
@@ -113,6 +129,8 @@ class WarehouseTasksAPIView(APIView):
         return paginator.get_paginated_response(serializer.data)
 
 class WarehousesAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         warehouses = Warehouse.objects.all()
         paginator = PageNumberPagination()
@@ -174,10 +192,23 @@ class WarehouseDetailsView(APIView):
 
     def delete(self, request, pk):
         warehouse = get_object_or_404(Warehouse.objects.all(), id=pk)
-        warehouse.delete()
-        return Response({"message": "deleted", "message": "Warehouse deleted"})
+        if request.user.role == 'admin' and warehouse.archived:
+            warehouse.delete()
+            CustomUser.objects.filter(warehouse=warehouse).delete()
+            WarehouseProduct.objects.filter(warehouse=warehouse).delete()
+            CustomerStore.objects.filter(warehouse=warehouse).delete()
+            return Response({"success": "true", "message": "Warehouse deleted"})
+        if not warehouse.archived:
+            warehouse.archived = True
+            warehouse.save()
+            CustomUser.objects.filter(warehouse = warehouse).update(archived = True)
+            WarehouseProduct.objects.filter(warehouse = warehouse).update(archived = True)
+            CustomerStore.objects.filter(warehouse = warehouse).update(archived = True)
+        return Response({"success": "true", "message": "Warehouse arxivlandi"})
 
 class WarehouseOrdersAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(manual_parameters=[
         openapi.Parameter('date', openapi.IN_QUERY, description="Filter by date", type=openapi.TYPE_STRING),
         openapi.Parameter('status', openapi.IN_QUERY, description="Filter by status", type=openapi.TYPE_STRING),
@@ -210,4 +241,14 @@ class WarehouseOrdersAPIView(APIView):
         paginator = PageNumberPagination()
         result_page = paginator.paginate_queryset(orders, request)
         serializer = OrderSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+class ArchivedWarehousesView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        warehouses = Warehouse.objects.filter(archived = True)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(warehouses, request)
+        serializer = WarehouseSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)

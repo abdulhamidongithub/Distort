@@ -6,7 +6,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from products.views import *
-from users.views import TasksAllAPIView, TaskDeleteAPIView
+from users.views import TasksAllAPIView, TaskDeleteAPIView, ArchivedUsersView
+from customers.views import ArchivedCustomersView
+from warehouses.views import ArchivedWarehousesView
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -34,5 +36,11 @@ urlpatterns = [
     path('tasks/<int:pk>/update/', TaskDeleteAPIView.as_view()),
     path('category/<int:pk>/', CategoryDetailAPIView.as_view()),
     path('category/<int:pk>/products/', CategoryProductsAPIView.as_view()),
+
+    path('archived/customers/', ArchivedCustomersView.as_view()),
+    path('archived/categories/', ArchivedCategoriesView.as_view()),
+    path('archived/products/', ArchivedProductsView.as_view()),
+    path('archived/users/', ArchivedUsersView.as_view()),
+    path('archived/warehouses/', ArchivedWarehousesView.as_view()),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

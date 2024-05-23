@@ -32,7 +32,7 @@ class UsersAPIView(APIView):
         openapi.Parameter('role', openapi.IN_QUERY, description="Search by role", type=openapi.TYPE_STRING)
     ])
     def get(self, request):
-        users = CustomUser.objects.all()
+        users = CustomUser.objects.filter(archived = False)
         role = request.query_params.get("role")
         if role:
             users = users.filter(role=role.lower())
@@ -81,8 +81,12 @@ class UserAPIView(APIView):
 
     def delete(self, request, pk):
         user = get_object_or_404(CustomUser.objects.all(), id=pk)
-        user.delete()
-        return Response({"success": "true", "message": "deleted"})
+        if request.user.role == 'admin' and user.archived:
+            user.delete()
+            return Response({"success": "true", "message": "deleted"})
+        user.archived = True
+        user.save()
+        return Response({"success": "true", "message": "User arxivlandi"}, status.HTTP_200_OK)
 
 class UserAPIView2(APIView):
     # User details based on the token
@@ -384,3 +388,13 @@ class DriverLocationPostView(APIView):
 
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=401)
+
+class ArchivedUsersView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        users = CustomUser.objects.filter(archived = True)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(users, request)
+        serializer = UserSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
