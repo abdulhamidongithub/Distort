@@ -22,13 +22,16 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 'success': "false",
                 'message': 'User not found'
             }, code=status.HTTP_400_BAD_REQUEST)
-
+        if user.archived:
+            raise serializers.ValidationError({
+                'success': "false",
+                'message': 'User arxivlangan'
+            }, code=status.HTTP_400_BAD_REQUEST)
         refresh = RefreshToken.for_user(user)
-
+        warehouse = None
         if user.warehouse:
             warehouse = WarehouseSerializer(user.warehouse).data
-        else:
-            warehouse = None
+
         return {
             'access': str(refresh.access_token),
             'refresh': str(refresh),
