@@ -29,11 +29,15 @@ class UsersAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter('role', openapi.IN_QUERY, description="Search by role", type=openapi.TYPE_STRING)
+        openapi.Parameter('role', openapi.IN_QUERY, description="Search by role", type=openapi.TYPE_STRING),
+        openapi.Parameter('warehouse_id', openapi.IN_QUERY, description="Search by warehouse id", type=openapi.TYPE_STRING),
     ])
     def get(self, request):
         users = CustomUser.objects.filter(archived = False)
         roles = request.query_params.get("role")
+        warehouse_id = request.query_params.get("warehouse_id")
+        if warehouse_id:
+            users = users.filter(warehouse__id = warehouse_id)
         if roles:
             roles = roles.split("-")
             users = users.filter(role=roles[0])
