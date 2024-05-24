@@ -33,9 +33,12 @@ class UsersAPIView(APIView):
     ])
     def get(self, request):
         users = CustomUser.objects.filter(archived = False)
-        role = request.query_params.get("role")
-        if role:
-            users = users.filter(role=role.lower())
+        roles = request.query_params.get("role")
+        if roles:
+            roles = roles.split("-")
+            users = users.filter(role=roles[0])
+            for role in roles[1:]:
+                users = users | CustomUser.objects.filter(role=role, archived=False)
         paginator = PageNumberPagination()
         result_page = paginator.paginate_queryset(users, request)
         serializer = UserSerializer(result_page, many=True)
