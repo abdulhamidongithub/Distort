@@ -30,13 +30,7 @@ class WarehouseProductsAPIView(APIView):
         paginator = PageNumberPagination()
         result_page = paginator.paginate_queryset(ware_products, request)
         serializer = WarehouseProductGetSerializer(result_page, many=True)
-        sum_of_all_products = sum(
-            wp.amount * wp.product.price for wp in ware_products if wp.product
-        )
-        return paginator.get_paginated_response({
-            "sum_of_all_products": sum_of_all_products,
-            "warehouse_products": serializer.data
-        })
+        return paginator.get_paginated_response(serializer.data)
 
 class WarehouseProductCreate(APIView):
     authentication_classes = [JWTAuthentication]

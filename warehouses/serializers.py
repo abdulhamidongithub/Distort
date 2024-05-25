@@ -20,7 +20,7 @@ class WarehouseProductSerializer(serializers.Serializer):
 class WarehouseProductGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = WarehouseProduct
-        fields = ['id', 'product', 'warehouse', 'amount', 'invalids_amount']
+        fields = ['id', 'product', 'warehouse', 'amount', 'invalids_amount', "total_sum"]
 
     def to_representation(self, instance):
         data = super(WarehouseProductGetSerializer, self).to_representation(instance)

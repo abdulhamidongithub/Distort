@@ -25,6 +25,12 @@ class WarehouseProduct(models.Model):
     amount = models.IntegerField()
     invalids_amount = models.IntegerField(default=0)
     archived = models.BooleanField(default=False)
+    total_sum = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        if self.product:
+            self.total_sum = self.product.price * self.amount
+        super().save(*args, **kwargs)
 
     class Meta:
         unique_together = ('warehouse', 'product')
