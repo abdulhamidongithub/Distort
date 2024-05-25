@@ -103,3 +103,6 @@ class DriverLocation(models.Model):
 
     def __str__(self):
         return self.driver.first_name
+
+    class Meta:
+        ordering = ["-id"]

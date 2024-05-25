@@ -31,11 +31,13 @@ class UsersAPIView(APIView):
     @swagger_auto_schema(manual_parameters=[
         openapi.Parameter('role', openapi.IN_QUERY, description="Search by role", type=openapi.TYPE_STRING),
         openapi.Parameter('warehouse_id', openapi.IN_QUERY, description="Search by warehouse id", type=openapi.TYPE_STRING),
+        openapi.Parameter('page', openapi.IN_QUERY, description="Search by page", type=openapi.TYPE_STRING),
     ])
     def get(self, request):
         users = CustomUser.objects.filter(archived = False)
         roles = request.query_params.get("role")
         warehouse_id = request.query_params.get("warehouse_id")
+        page = request.query_params.get("page")
         if warehouse_id:
             users = users.filter(warehouse__id = warehouse_id)
         if roles:
@@ -43,10 +45,13 @@ class UsersAPIView(APIView):
             users = users.filter(role=roles[0])
             for role in roles[1:]:
                 users = users | CustomUser.objects.filter(role=role, archived=False)
-        paginator = PageNumberPagination()
-        result_page = paginator.paginate_queryset(users, request)
-        serializer = UserSerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        if page:
+            paginator = PageNumberPagination()
+            result_page = paginator.paginate_queryset(users, request)
+            serializer = UserSerializer(result_page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
 
     @swagger_auto_schema(request_body=UserSerializer)
     def post(self, request):
