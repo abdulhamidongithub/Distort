@@ -12,12 +12,15 @@ from warehouses.models import WarehouseProduct
 from users.models import CustomUser
 from customers.models import CustomerStore
 
+
 class OrdersAPIView(APIView):
     @swagger_auto_schema(manual_parameters=[
         openapi.Parameter('date', openapi.IN_QUERY, description="Filter by date", type=openapi.TYPE_STRING),
         openapi.Parameter('status', openapi.IN_QUERY, description="Filter by status", type=openapi.TYPE_STRING),
-        openapi.Parameter('customer', openapi.IN_QUERY, description="Filter by customer ID, name, address, or phone", type=openapi.TYPE_STRING),
-        openapi.Parameter('product', openapi.IN_QUERY, description="Filter by product ID or name", type=openapi.TYPE_STRING),
+        openapi.Parameter('customer', openapi.IN_QUERY, description="Filter by customer ID, name, address, or phone",
+                          type=openapi.TYPE_STRING),
+        openapi.Parameter('product', openapi.IN_QUERY, description="Filter by product ID or name",
+                          type=openapi.TYPE_STRING),
     ])
     def get(self, request):
         orders = Order.objects.all()
@@ -37,8 +40,8 @@ class OrdersAPIView(APIView):
                 ) | orders.filter(customer__address__icontains=customer
                 ) | orders.filter(customer__phone__icontains=customer)
         if product:
-            orders = orders.filter(warehouse_product__product__id=product
-                ) | orders.filter(warehouse_product__product__name__icontains=product)
+            orders = orders.filter(items__warehouse_product__product__id=product
+                ) | orders.filter(items__warehouse_product__product__name__icontains=product)
         if date:
             orders = orders.filter(date_time__startswith=date)
 
@@ -59,18 +62,23 @@ class OrdersAPIView(APIView):
             "orders": serializer.data,
         })
 
-
     @swagger_auto_schema(request_body=OrderSerializer)
     def post(self, request):
-        order = request.data
-        product = WarehouseProduct.objects.get(id=order.get("warehouse_product"))
-        if product.amount < order.get("amount"):
-            return Response(
-                {"success": "false",
-                 "message": f"Miqdor yetarli emas. Mavjud miqdor: {product.amount}"},
-                      status.HTTP_406_NOT_ACCEPTABLE
-            )
-        serializer = OrderSerializer(data=order)
+        order_data = request.data
+        items_data = order_data.get('items')
+
+        for item_data in items_data:
+            product = WarehouseProduct.objects.get(id=item_data['warehouse_product'])
+            if product.amount < item_data['amount']:
+                return Response(
+                    {
+                        "success": "false",
+                        "message": f"Insufficient quantity for product {product.product.name}. Available quantity: {product.amount}"
+                    },
+                    status.HTTP_406_NOT_ACCEPTABLE
+                )
+
+        serializer = OrderSerializer(data=order_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status.HTTP_201_CREATED)

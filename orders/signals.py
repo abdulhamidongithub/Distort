@@ -2,11 +2,11 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import Order, KPIEarning
+from .models import Order, KPIEarning, OrderItem
 from users.models import SalaryParams
 
 
-@receiver(post_save, sender=Order)
+@receiver(post_save, sender=OrderItem)
 def decrement_amount_on_order_create(sender, instance, created, **kwargs):
     if created:
         warehouse_product = instance.warehouse_product
@@ -17,7 +17,7 @@ def decrement_amount_on_order_create(sender, instance, created, **kwargs):
 @receiver(pre_save, sender=Order)
 def create_kpi_earnings(sender, instance, **kwargs):
     if instance.status == 'Confirmed':
-        original_order = Order.objects.get(pk=instance.pk)
+        original_order = Order.objects.get(id=instance.id)
 
         if original_order.status != "Confirmed":
             users = {
@@ -34,22 +34,25 @@ def create_kpi_earnings(sender, instance, **kwargs):
 
             for role, user in users.items():
                 if user and salary_params[role]:
-                    amount = round(instance.total_price * (salary_params[role].kpi_by_sales / 100), 2)
-                    KPIEarning.objects.create(
-                        user=user,
-                        order=instance,
-                        amount=amount
-                    )
+                    amount = round(instance.final_price * (salary_params[role].kpi_by_sales / 100), 2)
+                    try:
+                        KPIEarning.objects.create(
+                            user=user,
+                            order=instance,
+                            amount=amount
+                        )
+                    except:
+                        pass
 
 
-@receiver(pre_save, sender=Order)
+@receiver(pre_save, sender=OrderItem)
 def return_amount_on_order_cancel(sender, instance, **kwargs):
-    if instance.status == "Cancelled":
+    if instance.order.status == "Cancelled":
         try:
-            original_order = Order.objects.get(pk=instance.pk)
-            if original_order.status != "Cancelled":
+            original_item = OrderItem.objects.get(id=instance.id)
+            if original_item.order.status != "Cancelled":
                 warehouse_product = instance.warehouse_product
                 warehouse_product.amount += instance.amount
                 warehouse_product.save()
-        except Order.DoesNotExist:
+        except OrderItem.DoesNotExist:
             pass
