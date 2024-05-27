@@ -326,10 +326,13 @@ class CalculateUserSalary(APIView):
         if not the_date:
             return Response({"success": "false", "message": "Month numbering is incorrect"})
         salary_params = get_object_or_404(SalaryParams.objects.all(), user=user)
-        kpi_earnings_sum = KPIEarning.objects.filter(
+        kpi_earnings = KPIEarning.objects.filter(
             user=user,
             date__startswith=the_date
-        ).aggregate(total_amount=Sum('amount')).get('total_amount', 0)
+        )
+        kpi_earnings_sum = 0
+        if kpi_earnings.exists():
+            kpi_earnings_sum = kpi_earnings.aggregate(total_amount=Sum('amount')).get('total_amount', 0)
         data = {
             "user": UserSerializer(user).data,
             "kpi_amount": kpi_earnings_sum,
