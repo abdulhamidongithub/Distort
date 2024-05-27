@@ -13,6 +13,7 @@ class WarehouseProductSerializer(serializers.Serializer):
     product = serializers.UUIDField()
     warehouse = serializers.UUIDField()
     amount = serializers.IntegerField()
+    total_sum = serializers.IntegerField(required=False)
     invalids_amount = serializers.IntegerField(required=False)
     archived = serializers.BooleanField(required=False)
     comment = serializers.CharField(required=False)

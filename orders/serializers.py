@@ -11,6 +11,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = ['id', 'warehouse_product', 'amount', 'tot_price']
 
+    def to_representation(self, instance):
+        data = super(OrderItemSerializer, self).to_representation(instance)
+        ware_product = WarehouseProduct.objects.get(id=data.get("warehouse_product"))
+        data['product_name'] = ware_product.product.name
+        return data
+
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
 

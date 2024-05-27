@@ -76,9 +76,16 @@ class WarehouseProductDetailAPIView(APIView):
     @swagger_auto_schema(request_body=WarehouseProductSerializer)
     def put(self, request, ware_pk, pr_pk):
         warehouse_product = get_object_or_404(WarehouseProduct.objects.all(), id=pr_pk)
-        serializer = WarehouseProductSerializer(instance=request.data, data=warehouse_product)
+        serializer = WarehouseProductSerializer(warehouse_product, data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        warehouse_product.amount = serializer.validated_data.get("amount", warehouse_product.amount)
+        warehouse_product.invalids_amount = serializer.validated_data.get("invalids_amount", warehouse_product.invalids_amount)
+        warehouse_product.archived = serializer.validated_data.get("archived", warehouse_product.archived)
+        if serializer.validated_data.get("warehouse"):
+            warehouse_product.warehouse = Warehouse.objects.get(id=serializer.validated_data.get("warehouse"))
+        if serializer.validated_data.get("product"):
+            warehouse_product.product = Product.objects.get(id=serializer.validated_data.get("product"))
+        warehouse_product.save()
         return Response(serializer.data)
 
 class WarehouseCustomersAPIView(APIView):
