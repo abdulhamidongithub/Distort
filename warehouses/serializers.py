@@ -10,9 +10,9 @@ class WarehouseSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class WarehouseProductSerializer(serializers.Serializer):
-    product = serializers.UUIDField()
-    warehouse = serializers.UUIDField()
-    amount = serializers.IntegerField()
+    product = serializers.UUIDField(required=False)
+    warehouse = serializers.UUIDField(required=False)
+    amount = serializers.IntegerField(required=False)
     total_sum = serializers.IntegerField(required=False)
     invalids_amount = serializers.IntegerField(required=False)
     archived = serializers.BooleanField(required=False)
