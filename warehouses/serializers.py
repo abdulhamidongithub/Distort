@@ -32,3 +32,26 @@ class WarehouseProductGetSerializer(serializers.ModelSerializer):
             product = ProductSerializer(Product.objects.get(id=instance.product.id))
             data.update({"product": product.data})
         return data
+
+class WarehouseProductArrivalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WarehouseProductArrival
+        fields = ["id", "warehouse_product", "amount", "invalids_amount", "comment", "date_time"]
+        extra_kwargs = {
+            'comment': {'required': False},
+            'date_time': {'required': False},
+            'invalids_amount': {'required': False},
+            'amount': {'required': False}
+        }
+
+    def create(self, validated_data):
+        warehouse_product_arrival = super().create(validated_data)
+
+        warehouse_product = warehouse_product_arrival.warehouse_product
+        warehouse_product.amount += validated_data.get('amount', 0)
+        warehouse_product.invalids_amount += validated_data.get('invalids_amount', 0)
+        warehouse_product.amount -= validated_data.get('invalids_amount', 0)
+        warehouse_product.save()
+
+        return warehouse_product_arrival
+

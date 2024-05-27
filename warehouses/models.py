@@ -38,6 +38,7 @@ class WarehouseProduct(models.Model):
 class WarehouseProductArrival(models.Model):
     warehouse_product = models.ForeignKey(WarehouseProduct, on_delete=models.CASCADE)
     amount = models.IntegerField()
+    invalids_amount = models.IntegerField(default=0)
     comment = models.TextField(null=True, blank=True)
     date_time = models.DateTimeField(auto_now_add=True)
 

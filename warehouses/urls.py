@@ -12,4 +12,5 @@ urlpatterns = [
     path('all/', WarehousesAPIView.as_view()),
     path('details/<str:pk>/', WarehouseDetailsView.as_view()),
     path('warehouse_product/create/', WarehouseProductCreate.as_view()),
+    path('warehouse_product/arrival/', WarehouseProductArrivalView.as_view()),
 ]

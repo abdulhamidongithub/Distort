@@ -253,3 +253,11 @@ class ArchivedWarehousesView(APIView):
         result_page = paginator.paginate_queryset(warehouses, request)
         serializer = WarehouseSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
+
+class WarehouseProductArrivalView(APIView):
+    @swagger_auto_schema(request_body=WarehouseProductArrivalSerializer)
+    def post(self, request):
+        serializer = WarehouseProductArrivalSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
