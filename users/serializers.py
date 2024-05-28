@@ -11,10 +11,12 @@ from .models import *
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     username = serializers.CharField()
     password = serializers.CharField()
+    driver_device_token = serializers.CharField(required=False)
 
     def validate(self, attrs):
         username = attrs.get('username')
         password = attrs.get('password')
+        driver_device_token = attrs.get('driver_device_token', None)
 
         user = CustomUser.objects.filter(username=username, password=password).first()
         if user is None:
@@ -31,7 +33,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         warehouse = None
         if user.warehouse:
             warehouse = WarehouseSerializer(user.warehouse).data
-
+        if driver_device_token:
+            user.driver_device_token = driver_device_token
+            user.save()
         return {
             'access': str(refresh.access_token),
             'refresh': str(refresh),

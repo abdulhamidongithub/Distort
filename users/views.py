@@ -13,12 +13,16 @@ from django.db.models import Sum
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from rest_framework.pagination import PageNumberPagination
+import json
+import requests
+from google.oauth2 import service_account
+from google.auth.transport.requests import Request
+from django.conf import settings
 
 from .models import *
 from orders.models import Order, KPIEarning
 from orders.serializers import OrderSerializer
 from .serializers import *
-
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -197,6 +201,18 @@ class ChangePasswordAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+SERVICE_ACCOUNT_FILE = settings.BASE_DIR/'users'/'distrox-af8e1-c4bfd80e73be.json'
+PROJECT_ID = 'distrox-af8e1'
+credentials = service_account.Credentials.from_service_account_file(
+    SERVICE_ACCOUNT_FILE, scopes=["https://www.googleapis.com/auth/firebase.messaging"]
+)
+
+def get_access_token():
+    auth_req = Request()
+    credentials.refresh(auth_req)
+    return credentials.token
+
 class TaskCreateAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -204,7 +220,34 @@ class TaskCreateAPIView(APIView):
     def post(self, request):
         serializer = TaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(task_setter = request.user)
+        task = serializer.save(task_setter = request.user)
+
+        access_token = get_access_token()
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+            'Content-Type': 'application/json; UTF-8',
+        }
+        url = f'https://fcm.googleapis.com/v1/projects/{PROJECT_ID}/messages:send'
+        task_executors = task.task_executors.filter(role='driver', driver_device_token__isnull=False)
+        temp = serializer.data
+        if task_executors.exists():
+            temp["task_setter"] = str(task.task_setter)
+            for executor in task_executors:
+                temp["task_executors"] = str(executor)
+                message = {
+                    'message': {
+                        'token': executor.driver_device_token,
+                        'notification': {
+                            'title': "Test",
+                            'body': "Sizga task biriktirildi!",
+                        },
+                        'data': {
+                            'task': json.dumps(temp)
+                        }
+                    }
+                }
+                requests.post(url, headers=headers, data=json.dumps(message))
+
         return Response(serializer.data, status.HTTP_201_CREATED)
 
 class UserReceivedTasks(APIView):
