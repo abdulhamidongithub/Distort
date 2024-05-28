@@ -42,17 +42,23 @@ class WarehouseProductCreate(APIView):
         validated_data = serializer.validated_data
         warehouse = get_object_or_404(Warehouse.objects.all(), id=validated_data['warehouse'])
         product = get_object_or_404(Product.objects.all(), id=validated_data['product'])
-        warehouse_product = WarehouseProduct.objects.create(
-            warehouse=warehouse,
-            product=product,
-            amount = validated_data.get('amount'),
-            invalids_amount = validated_data.get(('invalids_amount'), 0)
+        warehouse_product = WarehouseProduct.objects.filter(warehouse = warehouse, product = product).last()
+        if warehouse_product:
+            warehouse_product.amount += validated_data.get('amount')
+            warehouse_product.invalids_amount +=  validated_data.get(('invalids_amount'), 0)
+            warehouse_product.save()
+        else:
+            warehouse_product = WarehouseProduct.objects.create(
+                warehouse=warehouse,
+                product=product,
+                amount = validated_data.get('amount'),
+                invalids_amount = validated_data.get(('invalids_amount'), 0)
+            )
+        WarehouseProductArrival.objects.create(
+            warehouse_product=warehouse_product,
+            amount=validated_data['amount'],
+            comment=validated_data.get("comment", None)
         )
-        # WarehouseProductArrival.objects.create(
-        #     warehouse_product=warehouse_product,
-        #     amount=validated_data['amount'],
-        #     comment=validated_data.get("comment", None)
-        # )
         serializer = WarehouseProductSerializer(warehouse_product)
         return Response({"warehouse_product": serializer.data})
 
