@@ -95,6 +95,15 @@ class Task(models.Model):
     class Meta:
         ordering = ["-deadline", "-id"]
 
+class Notification(models.Model):
+    driver = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
+    text = models.TextField()
+    deadline = models.DateField(null=True, blank=True)
+    created_at = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.text
+
 class DriverLocation(models.Model):
     driver = models.ForeignKey(CustomUser, related_name='driver_location', on_delete=models.CASCADE)
     longitude = models.CharField(max_length=255, blank=True, null=True)

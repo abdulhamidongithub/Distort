@@ -247,7 +247,11 @@ class TaskCreateAPIView(APIView):
                     }
                 }
                 requests.post(url, headers=headers, data=json.dumps(message))
-
+                Notification.objects.create(
+                    driver = executor,
+                    text = task.text,
+                    deadline = task.deadline
+                )
         return Response(serializer.data, status.HTTP_201_CREATED)
 
 class UserReceivedTasks(APIView):
@@ -456,3 +460,12 @@ class ArchivedUsersView(APIView):
         result_page = paginator.paginate_queryset(users, request)
         serializer = UserSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
+
+class UserNotificationsView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        driver = request.user
+        notifications = Notification.objects.filter(driver = driver)
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data)

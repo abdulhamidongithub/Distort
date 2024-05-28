@@ -184,4 +184,7 @@ class DriverLocationSerializer(serializers.ModelSerializer):
         data['driver'] = driver_ser.data
         return data
 
-
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'
