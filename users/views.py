@@ -467,5 +467,7 @@ class UserNotificationsView(APIView):
     def get(self, request):
         driver = request.user
         notifications = Notification.objects.filter(driver = driver)
-        serializer = NotificationSerializer(notifications, many=True)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(notifications, request)
+        serializer = NotificationSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
