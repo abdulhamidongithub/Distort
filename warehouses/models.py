@@ -34,6 +34,7 @@ class WarehouseProduct(models.Model):
 
     class Meta:
         unique_together = ('warehouse', 'product')
+        ordering = ["product__name", "-id"]
 
 class WarehouseProductArrival(models.Model):
     warehouse_product = models.ForeignKey(WarehouseProduct, on_delete=models.CASCADE)
