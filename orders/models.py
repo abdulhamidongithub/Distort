@@ -20,9 +20,9 @@ class Order(models.Model):
     operator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name="operator_orders")
     warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True)
     driver = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="driver_orders")
-    sum = models.IntegerField(default=0)
+    sum = models.BigIntegerField(default=0)
     discount = models.IntegerField(default=0)
-    final_price = models.IntegerField(default=0)
+    final_price = models.BigIntegerField(default=0)
     deadline = models.DateTimeField(blank=True, null=True)
     date_time = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, null=True)
@@ -42,7 +42,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     warehouse_product = models.ForeignKey(WarehouseProduct, on_delete=models.SET_NULL, null=True)
     amount = models.IntegerField()
-    tot_price = models.IntegerField()
+    tot_price = models.BigIntegerField()
 
     def save(self, *args, **kwargs):
         self.tot_price = self.amount * self.warehouse_product.product.price

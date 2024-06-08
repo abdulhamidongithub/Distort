@@ -6,7 +6,7 @@ from users.models import CustomUser
 class CustomerStore(models.Model):
     id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, primary_key=True)
     name = models.CharField(max_length=50)
-    phone = models.CharField(max_length=15)
+    phone = models.CharField(max_length=15, unique=True)
     address = models.CharField(max_length=100)
     long = models.CharField(max_length=100, null=True, blank=True)
     lat = models.CharField(max_length=100, null=True, blank=True)

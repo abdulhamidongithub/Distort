@@ -9,6 +9,7 @@ from django.utils import timezone
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
+from django.db.models import Sum
 
 from .models import *
 from customers.models import CustomerStore
@@ -171,6 +172,7 @@ class WarehouseDetailsView(APIView):
         ).order_by('-date_time')
 
         warehouse_products = WarehouseProduct.objects.filter(warehouse=warehouse)
+        product_amount = warehouse_products.aggregate(total_amount=Sum('amount')).get("total_amount", 0)
         tasks = Task.objects.filter(
             created_at__gte=four_weeks_ago,
             task_executors__warehouse = warehouse
@@ -180,7 +182,7 @@ class WarehouseDetailsView(APIView):
         counts = {
             "orders": orders.count(),
             "tasks": tasks.count(),
-            "warehouse_products": warehouse_products.count(),
+            "warehouse_products": product_amount,
             "customers": customers.count(),
             "users": users.count()
         }
