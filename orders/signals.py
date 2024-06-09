@@ -24,6 +24,7 @@ def create_kpi_earnings(sender, instance, **kwargs):
                 'supervisor': instance.warehouse.customuser_set.filter(role='supervisor').last(),
                 'branch_director': instance.warehouse.customuser_set.filter(role='branch_director').last(),
                 'agent': instance.customer.added_by,
+                'operator': instance.operator,
             }
             salary_params = {}
             for role, user in users.items():
