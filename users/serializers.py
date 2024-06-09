@@ -75,8 +75,11 @@ class UserCreateSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = [
             'id', "first_name", "last_name", 'phone_number', "role", "username", "password", "address",
-            "birth_date", "status", "warehouse", "is_available", "photo"
+            "birth_date", "status", "warehouse", "is_available", "photo", "archived"
             ]
+        extra_kwargs = {
+            'archived': {'required': False}
+        }
 
 class SalaryParamsSerializer(serializers.ModelSerializer):
     class Meta:
